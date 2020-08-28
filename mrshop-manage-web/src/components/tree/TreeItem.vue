@@ -161,6 +161,12 @@
         }
       },
       deleteChild: function () {
+
+        if(this.model.isParent == 1){
+            this.$message.warning('父节点不能被删除');
+            return ;
+        }
+
         this.$message.confirm('此操作将永久删除数据，是否继续?', '提示', {
           confirmButtonText: '确定删除',
           cancelButtonText: '取消',
@@ -177,7 +183,7 @@
         this.$nextTick(() => this.$refs[this.model.id].focus());
       },
       afterEdit() {
-        if (this.model.beginEdit) {
+        if (this.beginEdit) {
           this.beginEdit = false;
           this.handleEdit(this.model.id, this.model.name);
         }
