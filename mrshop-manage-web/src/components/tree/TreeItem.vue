@@ -121,7 +121,7 @@
         // 展开后查询子节点
         this.$http.get(this.url, {params: {pid: this.model.id}})
           .then(resp => {
-          Vue.set(this.model, 'children', resp.data);
+          Vue.set(this.model, 'children', resp.data.data);
           // 封装当前节点的路径
           this.model.children.forEach(n => {
             n['path'] = [];

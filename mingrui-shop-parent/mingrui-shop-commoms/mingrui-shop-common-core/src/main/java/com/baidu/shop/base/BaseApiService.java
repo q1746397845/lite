@@ -47,6 +47,5 @@ public class BaseApiService<T> {
         log.info(String.format("{code : %s , msg : %s , data : %s}",code,msg, JSONUtil.toJsonString(data)));
         return new Result<T>(code, msg, data);
 
-
     }
 }

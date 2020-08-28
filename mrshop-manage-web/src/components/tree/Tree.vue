@@ -49,8 +49,11 @@
     },
     methods: {
       getData() {
+        //加载一级菜单
         this.$http.get(this.url, {params: {pid: 0}}).then(resp => {
-          this.db = resp.data;
+          console.log(this.url);
+          console.log(resp);
+          this.db = resp.data.data;
           this.db.forEach(n => n['path'] = [n.name])
         })
       },
