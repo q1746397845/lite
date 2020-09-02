@@ -110,7 +110,8 @@
             }
           }).then(resp => {
             const data = [];
-            for (let d of resp.data) {
+            console.log(resp)
+            for (let d of resp.data.data) {
               const node = {
                 value: d[this.itemValue],
                 label: d[this.itemText]

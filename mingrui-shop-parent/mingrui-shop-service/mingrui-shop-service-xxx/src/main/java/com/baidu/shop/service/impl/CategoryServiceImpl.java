@@ -6,7 +6,9 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
+import com.baidu.shop.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
@@ -36,6 +38,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return  this.setResultSuccess(list);
     }
 
+    @Transactional
     @Override
     public Result<List<JSONObject>> addCategory(CategoryEntity categoryEntity) {
 
@@ -55,6 +58,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess();
     }
 
+    @Transactional
     @Override
     public Result<List<JSONObject>> editCategory(CategoryEntity categoryEntity) {
 
@@ -63,6 +67,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess();
     }
 
+    @Transactional
     @Override
     public Result<List<JSONObject>> deleteCategory(Integer id) {
 
@@ -75,7 +80,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         //最后执行删除操作
 
         CategoryEntity category = categoryMapper.selectByPrimaryKey(id);
-        if(null == category){
+        if(ObjectUtil.isNull(id)){
             return this.setResultError("当前数据不存在");
         }
         if(category.getIsParent() == 1){

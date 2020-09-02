@@ -85,8 +85,10 @@
     methods: {
       handleSuccess(resp, file) {
         if (!this.multiple) {
-          this.dialogImageUrl = file.response;
-          this.$emit("input", file.response)
+          //文件上传成功后回显后台返回的图片
+          this.dialogImageUrl = file.response.data;
+          //给input表单赋值-->提交表单
+          this.$emit("input", file.response.data)
         } else {
           this.fileList.push(file)
           this.$emit("input", this.fileList.map(f => f.response))
