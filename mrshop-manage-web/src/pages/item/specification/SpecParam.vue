@@ -162,7 +162,7 @@ export default {
             if(resp.data.code == 200){
               this.$message.success("删除成功");
               this.loadData();
-            } 
+            }
           })
           .catch(() => {
             this.$message.error("删除失败");

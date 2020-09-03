@@ -112,6 +112,8 @@ export default {
           if (resp.data.code == 200) {
             this.$message.success("删除成功");
             this.loadData();
+          }else{
+              this.$message.error(resp.data.message);
           }
         });
       });

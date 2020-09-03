@@ -38,9 +38,12 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     @Override
     public Result<List<SpecGroupEntity>> getSpecGroupInfo(SpecGroupDTO specGroupDTO) {
 
+
+        if(ObjectUtil.isNull(specGroupDTO.getCid())) return this.setResultError("商品分类id为空");
+
         Example example = new Example(SpecGroupEntity.class);
 
-        if(ObjectUtil.isNotNull(specGroupDTO.getCid())) example.createCriteria().andEqualTo("cid",specGroupDTO.getCid());
+        example.createCriteria().andEqualTo("cid",specGroupDTO.getCid());
 
         List<SpecGroupEntity> specGroupEntities = specGroupMapper.selectByExample(example);
 
@@ -69,15 +72,32 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     @Transactional
     @Override
     public Result<List<JSONObject>> deleteSpecGroup(Integer id) {
+
+
+        //List<SpecParamEntity> list = specGroupMapper.getParambByGroupId(id);
+
+
+        //判断当前组有没有绑定参数,如果绑定了不能被删除
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId", id);
+        List<SpecParamEntity> list = specParamMapper.selectByExample(example);
+
+        if(list.size() > 0){
+            return this.setResultError("当前组下有参数,不能被删除");
+        }
+
         specGroupMapper.deleteByPrimaryKey(id);
 
         return this.setResultSuccess();
     }
 
 
+    //-------------------------规格参数crud-------------------------------
+
     @Override
     public Result<List<SpecParamEntity>> getSpecParamInfo(SpecParamDTO specParamDTO) {
 
+        //如果规格组id不是空的话 通过规格组id查询该规格组拥有的规格参数
         if(ObjectUtil.isNull(specParamDTO.getGroupId())) return this.setResultError("没有规格组id");
 
         Example example = new Example(SpecParamEntity.class);

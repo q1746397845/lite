@@ -3,7 +3,10 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.entity.BrandEntity;
+import com.baidu.shop.entity.CategoryBrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.util.ObjectUtil;
@@ -74,19 +77,45 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
         //通过id查询出这条要删除的数据
         //判断有没有数据
-        //判断是不是父节点
-        //构建条件查询,通过当前节点的pid查询数据
-        //判断查询出来的数据 是不是一条 ,是一条的话 把父级节点的isParent修改为0,修改为不是父节点
-        //最后执行删除操作
-
         CategoryEntity category = categoryMapper.selectByPrimaryKey(id);
         if(ObjectUtil.isNull(id)){
             return this.setResultError("当前数据不存在");
         }
+        //判断是不是父节点
         if(category.getIsParent() == 1){
             return this.setResultError("当前数据为父节点,不能删除");
         }
 
+
+
+        StringBuilder groupName = new StringBuilder();
+        //判断有没有被规格组绑定
+        //如果被绑定了的话,被哪个组绑定
+        List<SpecGroupEntity> groupList = categoryMapper.getGroupByCategoryId(id);
+        if(groupList.size() > 0){
+            groupList.forEach(group ->{
+                groupName.append(" " + group.getName() + " ");
+            });
+            return this.setResultError("当前节点被"+ groupName + "规格绑定,不能被删除");
+        }
+
+
+        StringBuilder brandName = new StringBuilder();
+        //判断有没有被品牌绑定
+        //如果被绑定了,被哪个品牌绑定
+        List<BrandEntity> BrandList = categoryMapper.getBrandByCategoryId(id);
+        if(BrandList.size() > 0){
+            BrandList.forEach(brand ->{
+                brandName.append(" "+  brand.getName() + " ");
+            });
+            return this.setResultError("当前节点被"+ brandName +"品牌绑定,不能被删除");
+        }
+
+
+
+        //构建条件查询,通过当前节点的pid查询数据
+        //判断查询出来的数据 是不是一条 ,是一条的话 把父级节点的isParent修改为0,修改为不是父节点
+        //最后执行删除操作
         Example example = new Example(CategoryEntity.class);
         example.createCriteria().andEqualTo("parentId",category.getParentId());
         List<CategoryEntity> list = categoryMapper.selectByExample(example);
@@ -103,6 +132,9 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess();
     }
 
+
+
+    //修改品牌绑定的商品分类时,用来回显当前品牌绑定的分类
     @Override
     public Result<List<CategoryEntity>> getCatesByBrand(Integer brandId) {
 

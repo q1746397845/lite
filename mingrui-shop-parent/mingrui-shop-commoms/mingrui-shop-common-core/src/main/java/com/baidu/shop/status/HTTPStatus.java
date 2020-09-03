@@ -17,4 +17,6 @@ public class HTTPStatus {
 
     public static final int PARAMS_VALIDATE_ERROR = 5002;//参数校验失败
 
+
+
 }

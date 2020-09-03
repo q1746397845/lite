@@ -52,9 +52,13 @@
         console.log("delete ... " + id)
         this.$http.delete('category/delete?id=' + id).then(resp =>{
 
-          this.$message.success('删除成功');
-           this.refreshKey = new Date().getTime();//避免key值重复,key值改变可以刷新页面
-
+          if(resp.data.code == 200){
+            this.$message.success('删除成功');
+            this.refreshKey = new Date().getTime();//避免key值重复,key值改变可以刷新页面
+          }else{
+            this.$message.error(resp.data.message);
+            this.refreshKey = new Date().getTime();
+          }
         }).catch(error => console.log(error));
       },
       handleClick(node) {
