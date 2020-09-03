@@ -102,4 +102,12 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }
+
+    @Override
+    public Result<List<CategoryEntity>> getCatesByBrand(Integer brandId) {
+
+        List<CategoryEntity> catesByBrand = categoryMapper.getCatesByBrand(brandId);
+
+        return this.setResultSuccess(catesByBrand);
+    }
 }

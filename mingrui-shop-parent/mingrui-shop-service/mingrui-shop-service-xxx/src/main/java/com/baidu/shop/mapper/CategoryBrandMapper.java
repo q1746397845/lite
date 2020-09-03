@@ -4,6 +4,8 @@ import com.baidu.shop.entity.CategoryBrandEntity;
 import tk.mybatis.mapper.common.special.InsertListMapper;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.util.List;
+
 /**
  * @ClassName CategoryBrandMapper
  * @Description: TODO
@@ -12,4 +14,6 @@ import tk.mybatis.mapper.common.Mapper;
  * @Version V1.0
  **/
 public interface  CategoryBrandMapper extends Mapper<CategoryBrandEntity>, InsertListMapper<CategoryBrandEntity> {
+
+
 }

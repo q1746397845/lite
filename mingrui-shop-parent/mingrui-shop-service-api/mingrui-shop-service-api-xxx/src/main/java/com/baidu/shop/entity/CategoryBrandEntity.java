@@ -18,5 +18,5 @@ public class CategoryBrandEntity {
 
     private Integer categoryId;
 
-    private Integer BrandId;
+    private Integer brandId;
 }

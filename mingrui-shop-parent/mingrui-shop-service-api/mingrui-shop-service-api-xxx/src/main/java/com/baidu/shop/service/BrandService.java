@@ -10,10 +10,7 @@ import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,5 +32,13 @@ public interface BrandService {
     @ApiOperation(value = "新增品牌")
     @PostMapping(value = "brand/save")
     public Result<JSONObject> saveBrand(@Validated(MingruiOperation.Add.class) @RequestBody BrandDTO brandDTO);
+
+    @ApiOperation(value = "修改品牌")
+    @PutMapping(value = "brand/save")
+    public Result<JSONObject> editBrand(@Validated(MingruiOperation.Update.class) @RequestBody BrandDTO brandDTO);
+
+    @ApiOperation(value = "修改品牌")
+    @DeleteMapping(value = "brand/delete")
+    public Result<JSONObject> deleteBrand(Integer id);
 
 }

@@ -6,7 +6,7 @@
           <v-card>
             <v-card-title>选择分类，查看规格参数模板：</v-card-title>
             <v-divider/>
-              <v-tree url="/item/category/list"
+              <v-tree url="category/list"
                   :isEdit="false"
                   @handleClick="handleClick"
           />
