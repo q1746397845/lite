@@ -88,27 +88,35 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
 
 
-        StringBuilder groupName = new StringBuilder();
+
+
         //判断有没有被规格组绑定
         //如果被绑定了的话,被哪个组绑定
         List<SpecGroupEntity> groupList = categoryMapper.getGroupByCategoryId(id);
         if(groupList.size() > 0){
+
+            StringBuilder stringBuilder = new StringBuilder();
+
             groupList.forEach(group ->{
-                groupName.append(" " + group.getName() + " ");
+                stringBuilder.append(" " + group.getName() + " ");
             });
-            return this.setResultError("当前节点被"+ groupName + "规格绑定,不能被删除");
+
+
+            return this.setResultError("当前节点被"+ stringBuilder + "规格绑定,不能被删除");
         }
 
-
-        StringBuilder brandName = new StringBuilder();
         //判断有没有被品牌绑定
         //如果被绑定了,被哪个品牌绑定
         List<BrandEntity> BrandList = categoryMapper.getBrandByCategoryId(id);
         if(BrandList.size() > 0){
+
+            StringBuilder stringBuilder = new StringBuilder();
+
             BrandList.forEach(brand ->{
-                brandName.append(" "+  brand.getName() + " ");
+                stringBuilder.append(" "+  brand.getName() + " ");
             });
-            return this.setResultError("当前节点被"+ brandName +"品牌绑定,不能被删除");
+
+            return this.setResultError("当前节点被"+ stringBuilder +"品牌绑定,不能被删除");
         }
 
 
