@@ -101,8 +101,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
                 stringBuilder.append(" " + group.getName() + " ");
             });
 
-
-            return this.setResultError("当前节点被"+ stringBuilder + "规格绑定,不能被删除");
+            return this.setResultError("当前节点下有"+ stringBuilder + "规格组,不能被删除");
         }
 
         //判断有没有被品牌绑定
