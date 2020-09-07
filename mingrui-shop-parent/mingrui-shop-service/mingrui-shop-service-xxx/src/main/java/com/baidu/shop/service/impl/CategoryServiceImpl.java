@@ -91,7 +91,6 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
 
         //判断有没有被规格组绑定
-        //如果被绑定了的话,被哪个组绑定
         List<SpecGroupEntity> groupList = categoryMapper.getGroupByCategoryId(id);
         if(groupList.size() > 0){
 
