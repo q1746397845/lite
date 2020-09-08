@@ -155,10 +155,10 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
 
         //前台传来的分页信息 是 1,5 , sql语句需要 0,5,所以得减去 1
-//        if(ObjectUtil.isNotNull(spuDTO.getPage())){
-//            Integer page = spuDTO.getPage() - 1;
-//            spuDTO.setPage(page);
-//        }
+        if(ObjectUtil.isNotNull(spuDTO.getPage())){
+            Integer page = spuDTO.getPage() - 1;
+            spuDTO.setPage(page);
+        }
 
 
         List<SpuDTO> listDTO = spuMapper.getSpuDTO(spuDTO);
