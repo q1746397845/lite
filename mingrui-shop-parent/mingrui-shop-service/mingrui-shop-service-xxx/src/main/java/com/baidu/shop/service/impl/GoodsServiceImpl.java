@@ -49,8 +49,8 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     private BrandMapper brandMapper;
 
 
-    @Override
-    public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
+    //@Override
+    public Result<PageInfo<SpuDTO>> getSpuInfos(SpuDTO spuDTO) {
 
         //分页
         if(ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
@@ -138,5 +138,14 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         long total = pageInfo.getTotal();
         //借用一下message属性
         return this.setResult(HTTPStatus.OK,"" + total, spuDtoList);
+    }
+
+    //代码简化
+    //通过一条sql语句直接干上边的事
+    @Override
+    public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
+        List<SpuDTO> listDTO = spuMapper.getSpuDTO(spuDTO);
+        Integer total = spuMapper.count(spuDTO);
+        return this.setResult(HTTPStatus.OK,"" + total, listDTO);
     }
 }

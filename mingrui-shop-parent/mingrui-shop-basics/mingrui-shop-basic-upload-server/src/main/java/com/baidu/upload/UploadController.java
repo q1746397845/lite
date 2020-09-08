@@ -23,7 +23,7 @@ import java.util.UUID;
  * @Version V1.0
  **/
 @RestController
-@RequestMapping(value = "upload")
+@RequestMapping(value = "upload/upload")
 public class UploadController extends BaseApiService {
 
     //windows 系统上传路径

@@ -42,6 +42,7 @@ public class BrandServiceImpl  extends BaseApiService implements BrandService {
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
 
+
     @Override
     public Result<PageInfo<BrandEntity>> getBrand(BrandDTO brandDTO) {
 
@@ -192,5 +193,18 @@ public class BrandServiceImpl  extends BaseApiService implements BrandService {
         categoryBrandMapper.deleteByExample(example);
 
         return this.setResultSuccess();
+    }
+
+
+
+
+    @Override
+    public Result<List<BrandEntity>> getBrandByCategoryId(Integer categoryId) {
+        if(ObjectUtil.isNotNull(categoryId)){
+            List<BrandEntity> list = categoryBrandMapper.getBrandByCategoryId(categoryId);
+            return this.setResultSuccess(list);
+        }
+
+        return this.setResultError("没查到");
     }
 }

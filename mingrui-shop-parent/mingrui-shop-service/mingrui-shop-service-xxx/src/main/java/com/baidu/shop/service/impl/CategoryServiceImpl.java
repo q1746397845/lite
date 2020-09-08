@@ -4,17 +4,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
-import com.baidu.shop.entity.CategoryBrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.mapper.CategoryBrandMapper;
 import com.baidu.shop.mapper.CategoryMapper;
+import com.baidu.shop.mapper.SpecGroupMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.util.ObjectUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -27,8 +28,14 @@ import java.util.List;
 @RestController
 public class CategoryServiceImpl extends BaseApiService implements CategoryService {
 
-    @Autowired
+    @Resource
     private CategoryMapper categoryMapper;
+
+    @Resource
+    private CategoryBrandMapper categoryBrandMapper;
+
+    @Resource
+    private SpecGroupMapper specGroupMapper;
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
@@ -91,7 +98,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
 
         //判断有没有被规格组绑定
-        List<SpecGroupEntity> groupList = categoryMapper.getGroupByCategoryId(id);
+        List<SpecGroupEntity> groupList = specGroupMapper.getGroupByCategoryId(id);
         if(groupList.size() > 0){
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -105,7 +112,8 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
         //判断有没有被品牌绑定
         //如果被绑定了,被哪个品牌绑定
-        List<BrandEntity> BrandList = categoryMapper.getBrandByCategoryId(id);
+        List<BrandEntity> BrandList = categoryBrandMapper.getBrandByCategoryId(id);
+
         if(BrandList.size() > 0){
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -144,7 +152,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
     @Override
     public Result<List<CategoryEntity>> getCatesByBrand(Integer brandId) {
 
-        List<CategoryEntity> catesByBrand = categoryMapper.getCatesByBrand(brandId);
+        List<CategoryEntity> catesByBrand = categoryBrandMapper.getCatesByBrandId(brandId);
 
         return this.setResultSuccess(catesByBrand);
     }

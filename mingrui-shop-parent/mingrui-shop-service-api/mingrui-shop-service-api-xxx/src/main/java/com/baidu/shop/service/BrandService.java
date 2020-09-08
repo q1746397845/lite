@@ -41,4 +41,9 @@ public interface BrandService {
     @DeleteMapping(value = "brand/delete")
     public Result<JSONObject> deleteBrand(Integer id);
 
+
+    @ApiOperation(value = "通过分类id查询品牌")
+    @GetMapping(value = "brand/getBrandByCategoryId")
+    public Result<List<BrandEntity>> getBrandByCategoryId(Integer categoryId);
+
 }

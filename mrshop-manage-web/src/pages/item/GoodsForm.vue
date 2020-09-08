@@ -18,7 +18,7 @@
               <v-flex xs5>
                 <!--商品分类-->
                 <v-cascader
-                  url="/item/category/list"
+                  url="category/list"
                   required
                   showAllLevels
                   v-model="goods.categories"
@@ -54,7 +54,7 @@
       </v-stepper-content>
       <!--2、商品描述-->
       <v-stepper-content step="2">
-        <v-editor v-model="goods.spuDetail.description" upload-url="/upload/image"/>
+        <v-editor v-model="goods.spuDetail.description" upload-url="/upload"/>
       </v-stepper-content>
       <!--3、规格参数-->
       <v-stepper-content step="3">
@@ -116,7 +116,7 @@
               <template slot="expand" slot-scope="props">
                 <v-card class="elevation-2 flex xs11 mx-auto my-2">
                   <!--图片上传组件-->
-                  <v-upload v-model="props.item.images" url="/upload/image"/>
+                  <v-upload v-model="props.item.images" url="/upload"/>
                 </v-card>
               </template>
             </v-data-table>
@@ -203,7 +203,8 @@ export default {
             indexes,
             enable,
             title, // 基本属性
-            images: images ? images.join(",") : '', // 图片
+            //images: images ? images.join(",") : '', // 图片
+            images: images ? images.map(i => i.data).join(",") : '', // 图片
             ownSpec: JSON.stringify(obj) // 特有规格参数
           };
         });
@@ -278,14 +279,22 @@ export default {
         if (val && val.length > 0) {
           // 根据分类查询品牌
           this.$http
-            .get("/item/brand/cid/" + this.goods.categories[2].id)
-            .then(({ data }) => {
-              this.brandOptions = data;
-            });
+            .get("brand/getBrandByCategoryId",{
+              params:{
+                categoryId:this.goods.categories[2].id
+              }
+            }).then(resp => {
+              console.log(resp)
+              this.brandOptions = resp.data.data;
+            }).catch(error => console.log(error));
           // 根据分类查询规格参数
           this.$http
-            .get("/item/spec/params?cid=" + this.goods.categories[2].id)
-            .then(({ data }) => {
+            .get("specParam/getSpecParamInfo",{
+              params:{
+                cid:this.goods.categories[2].id
+              }
+            }).then(resp => {
+              console.log(resp)
               let specs = [];
               let template = [];
               if (this.isEdit){
@@ -295,7 +304,7 @@ export default {
               // 对特有规格进行筛选
               const arr1 = [];
               const arr2 = [];
-              data.forEach(({id, name,generic, numeric, unit }) => {
+              resp.data.data.forEach(({id, name,generic, numeric, unit }) => {
                 if(generic){
                   const o = { id, name, numeric, unit};
                   if(this.isEdit){

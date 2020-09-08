@@ -25,7 +25,7 @@ import java.io.InputStream;
  * @Version V1.0
  **/
 @RestController
-@RequestMapping(value = "FastDFSUpload")
+@RequestMapping(value = "upload")
 @Slf4j
 public class FastDFSUploadController {
     //图片服务器的地址

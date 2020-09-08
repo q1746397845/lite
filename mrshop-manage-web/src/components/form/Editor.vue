@@ -92,8 +92,8 @@
         data.append(this.fileName, fileInput.files[0]);
         this.$http.post(this.uploadUrl, data)
           .then(res => {
-            if (res.data) {
-              this.editor.insertEmbed(this.editor.getSelection().index, 'image', res.data)
+            if (res.data.data) {
+              this.editor.insertEmbed(this.editor.getSelection().index, 'image', res.data.data)
             }
           })
       },
