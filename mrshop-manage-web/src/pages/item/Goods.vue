@@ -6,13 +6,13 @@
       <v-flex xs3>
         状态：
         <v-btn-toggle mandatory v-model="search.saleable">
-          <v-btn flat>
+          <v-btn flat :value="2">
             全部
           </v-btn>
-          <v-btn flat :value="true">
+          <v-btn flat :value="1">
             上架
           </v-btn>
-          <v-btn flat :value="false">
+          <v-btn flat :value="0">
             下架
           </v-btn>
         </v-btn-toggle>
@@ -103,7 +103,7 @@
       return {
         search: {
           key: '',
-          saleable: true,
+          saleable: 1,
         },// 过滤字段
         totalItems: 0,// 总条数
         items: [],// 表格数据
@@ -113,7 +113,7 @@
           {text: 'id', align: 'center', value: 'id'},
           {text: '标题', align: 'center', sortable: false, value: 'name'},
           {text: '商品分类', align: 'center', sortable: false, value: 'image'},
-          {text: '品牌', align: 'center', value: 'letter', sortable: true,},
+          {text: '品牌', align: 'center', value: 'brandName', sortable: false,},
           {text: '操作', align: 'center', value: 'id', sortable: false}
         ],
         show: false,// 是否弹出窗口
@@ -202,12 +202,30 @@
       },
       getDataFromApi() {
         this.loading = true;
-        setTimeout(() => {
-          // 返回假数据
-          this.items = goodsData.slice(0, 4);
-          this.totalItems = 25;
-          this.loading = false;
-        }, 300)
+        this.$http.get("goods/getSpuInfo",{
+          params:{
+            page: this.pagination.page,
+            rows: this.pagination.rowsPerPage,
+            sort: this.pagination.sortBy,
+            order: this.pagination.descending,
+            saleable: this.search.saleable,
+            title: this.search.key
+          }
+        }).then(resp =>{
+          console.log(resp)
+          if(resp.data.code == 200){
+            this.items = resp.data.data;
+            this.totalItems = resp.data.message;
+            this.loading = false;
+          }   
+        }).catch(error =>console.log(error))
+
+        // setTimeout(() => {
+        //   // 返回假数据
+        //   this.items = goodsData.slice(0, 4);
+        //   this.totalItems = 25;
+        //   this.loading = false;
+        // }, 300)
       }
     }
   }
