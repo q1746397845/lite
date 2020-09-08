@@ -15,7 +15,7 @@ import javax.persistence.Id;
  **/
 @Data
 @ApiModel(value = "spu大字段数据传输类")
-public class SpuDetailDTO {
+public class SpuDetailDTO  extends BaseDTO{
 
     @ApiModelProperty(value = "spu主键",example = "1")
     private Integer spuId;

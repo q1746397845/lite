@@ -216,13 +216,14 @@ export default {
       });
       goodsParams.spuDetail.genericSpec = JSON.stringify(specs);
       goodsParams.spuDetail.specialSpec = JSON.stringify(specTemplate);
-
+      console.log(JSON.stringify(goodsParams));
       this.$http({
         method: this.isEdit ? "put" : "post",
-        url: "/item/goods",
+        url: "goods/saveGoods",
         data: goodsParams
       })
-        .then(() => {
+        .then(resp => {
+          console.log(resp)
           // 成功，关闭窗口
           this.$emit("close");
           // 提示成功

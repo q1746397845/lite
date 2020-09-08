@@ -4,12 +4,8 @@ import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.dto.SpuDTO;
-import com.baidu.shop.entity.BrandEntity;
-import com.baidu.shop.entity.CategoryEntity;
-import com.baidu.shop.entity.SpuEntity;
-import com.baidu.shop.mapper.BrandMapper;
-import com.baidu.shop.mapper.CategoryMapper;
-import com.baidu.shop.mapper.SpuMapper;
+import com.baidu.shop.entity.*;
+import com.baidu.shop.mapper.*;
 import com.baidu.shop.service.GoodsService;
 import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.util.BaiduBeanUtil;
@@ -17,12 +13,16 @@ import com.baidu.shop.util.ObjectUtil;
 import com.baidu.shop.util.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.corba.se.spi.ior.ObjectAdapterId;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +47,15 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
     @Resource
     private BrandMapper brandMapper;
+
+    @Resource
+    private SkuMapper skuMapper;
+
+    @Resource
+    private StockMapper stockMapper;
+
+    @Resource
+    private SpuDetailMapper spuDetailMapper;
 
 
     //@Override
@@ -144,8 +153,61 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //通过一条sql语句直接干上边的事
     @Override
     public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
+
+        //前台传来的分页信息 是 1,5 , sql语句需要 0,5,所以得减去 1
+//        if(ObjectUtil.isNotNull(spuDTO.getPage())){
+//            Integer page = spuDTO.getPage() - 1;
+//            spuDTO.setPage(page);
+//        }
+
+
         List<SpuDTO> listDTO = spuMapper.getSpuDTO(spuDTO);
         Integer total = spuMapper.count(spuDTO);
         return this.setResult(HTTPStatus.OK,"" + total, listDTO);
+    }
+
+
+    //新增商品
+    @Override
+    @Transactional
+    public Result<PageInfo<SpuDTO>> saveGoods(SpuDTO spuDTO) {
+
+        //新增spu
+        //新增返回主键
+        SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
+
+        final Date date = new Date();//保持时间一致
+
+        //设置默认值
+        spuEntity.setSaleable(1);
+        spuEntity.setValid(1);
+        spuEntity.setCreateTime(date);
+        spuEntity.setLastUpdateTime(date);
+        spuMapper.insertSelective(spuEntity);
+
+        //新增spuDetail
+        SpuDetailEntity spuDetailEntity = BaiduBeanUtil.copyProperties(spuDTO.getSpuDetail(), SpuDetailEntity.class);
+        spuDetailEntity.setSpuId(spuEntity.getId());
+        spuDetailMapper.insertSelective(spuDetailEntity);
+
+        //新增sku 和 stock
+        spuDTO.getSkus().stream().forEach(skuDto ->{
+
+            SkuEntity skuEntity = BaiduBeanUtil.copyProperties(skuDto, SkuEntity.class);
+            skuEntity.setCreateTime(date);
+            skuEntity.setLastUpdateTime(date);
+            skuEntity.setSpuId(spuEntity.getId());
+            skuMapper.insertSelective(skuEntity);
+
+            StockEntity stockEntity = new StockEntity();
+            stockEntity.setStock(skuDto.getStock());
+            stockEntity.setSkuId(skuEntity.getId());
+            stockMapper.insertSelective(stockEntity);
+
+        });
+
+
+
+        return this.setResultSuccess();
     }
 }

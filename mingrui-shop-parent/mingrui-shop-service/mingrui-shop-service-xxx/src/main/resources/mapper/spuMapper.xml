@@ -38,7 +38,7 @@
         </if>
 
         <if test="page != null and rows != null">
-            limit #{page},#{rows}
+            limit #{page -1},#{rows}
         </if>
     </select>
 

@@ -15,7 +15,7 @@ import java.util.Date;
  **/
 @Data
 @ApiModel(value = "SKU属性数据传输类")
-public class SkuDTO {
+public class SkuDTO extends BaseDTO {
 
     @ApiModelProperty(value = "主键",example = "1")
     private Long id;

@@ -2,6 +2,9 @@ package com.baidu.shop.entity;
 
 import lombok.Data;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -16,6 +19,8 @@ import java.util.Date;
 @Table(name = "tb_sku")
 public class SkuEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Integer spuId;
@@ -30,7 +35,7 @@ public class SkuEntity {
 
     private String ownSpec;
 
-    private Integer  enable;
+    private Integer enable;
 
     private Date createTime;
 

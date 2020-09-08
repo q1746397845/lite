@@ -13,7 +13,7 @@ import lombok.Data;
  **/
 @ApiModel(value = "库存数据传输类")
 @Data
-public class StockDTO {
+public class StockDTO extends BaseDTO{
 
     @ApiModelProperty(value = "sku主键", example = "1")
     private Long skuId;
