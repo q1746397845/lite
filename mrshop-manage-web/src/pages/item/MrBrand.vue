@@ -86,6 +86,8 @@ export default {
               if (resp.data.code == 200) {
                 //刷新列表
                 this.getBrand();
+              }else{
+                this.$message.info(resp.data.message);
               }
             }).catch((error) => console.log(error));
         }).catch(() => {

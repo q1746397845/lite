@@ -5,8 +5,10 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.mapper.BrandMapper;
 import com.baidu.shop.mapper.CategoryBrandMapper;
+import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.BrandService;
 import com.baidu.shop.util.BaiduBeanUtil;
 import com.baidu.shop.util.ObjectUtil;
@@ -41,6 +43,9 @@ public class BrandServiceImpl  extends BaseApiService implements BrandService {
 
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
+
+    @Resource
+    private SpuMapper spuMapper;
 
 
     @Override
@@ -186,6 +191,19 @@ public class BrandServiceImpl  extends BaseApiService implements BrandService {
     @Override
     public Result<JSONObject> deleteBrand(Integer id) {
 
+        //判断品牌有没有被商品绑定
+        Example SpuEntityExample = new Example(SpuEntity.class);
+        SpuEntityExample.createCriteria().andEqualTo("BrandId",id);
+        List<SpuEntity> spuList = spuMapper.selectByExample(SpuEntityExample);
+        if(spuList.size() > 0){
+            StringBuilder brandName = new StringBuilder();
+            spuList.stream().forEach(spu ->{
+                brandName.append(" " + spu.getTitle() + " ");
+            });
+            return this.setResultError("当前品牌被: " + brandName + "绑定,不能被删除");
+        }
+
+        //删除品牌和关系表中的数据
         brandMapper.deleteByPrimaryKey(id);
 
         Example example = new Example(CategoryBrandEntity.class);

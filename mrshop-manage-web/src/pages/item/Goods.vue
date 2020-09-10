@@ -48,8 +48,8 @@
           <v-btn icon small @click="deleteItem(props.item.id)">
             <i class="el-icon-delete"/>
           </v-btn>
-          <v-btn icon small v-if="props.item.saleable">下架</v-btn>
-          <v-btn icon v-else>上架</v-btn>
+          <v-btn icon small v-if="props.item.saleable" @click="goodsUpDown(props.item.id,0)">下架</v-btn>
+          <v-btn icon v-else @click="goodsUpDown(props.item.id,1)">上架</v-btn>
         </td>
       </template>
       <template slot="no-data">
@@ -73,7 +73,7 @@
         </v-toolbar>
         <v-card-text style="height: 600px;">
           <!-- 表单 -->
-          <goods-form :oldGoods="selectedGoods" :isEdit="isEdit" :step="step" ref="goodsForm" @closeForm="closeForm"/>
+          <goods-form  :refresh="getDataFromApi" :oldGoods="selectedGoods" :isEdit="isEdit" :step="step" ref="goodsForm" @closeForm="closeForm"/>
         </v-card-text>
         <v-card-actions>
           <v-layout row justify-center>
@@ -101,6 +101,7 @@
     },
     data() {
       return {
+        state:'',//提醒用户上下架
         search: {
           key: '',
           saleable: 1,
@@ -140,6 +141,29 @@
       this.getDataFromApi();
     },
     methods: {
+      //上下架方法
+      goodsUpDown(spuId,saleableState){
+        this.$http.put("goods/updateSaleable",{
+          id:spuId,
+          saleable:saleableState
+        }
+        ).then(resp =>{
+          if(resp.data.code == 200){
+            
+            if(saleableState == 0){
+              this.state = "下架成功";
+            }else if(saleableState == 1){
+              this.state = "上架成功";
+            }
+            this.$message.success(this.state); 
+            //刷新列表
+            this.getDataFromApi();
+          }else if(resp.data.code == 500){
+            this.state = "操作失败";
+            this.$message.error(this.state); 
+          }
+        }).catch(error => console.log(error))
+      },
       closeForm() {
         this.isEdit = false;
         this.show = false;
@@ -167,32 +191,59 @@
         this.show = true;
       },
       editItem(item) {
-        this.selectedGoods = item;
-        const names = item.categoryName.split("/");
-        this.selectedGoods.categories = [
-          {id: item.cid1, name: names[0]},
-          {id: item.cid2, name: names[1]},
-          {id: item.cid3, name: names[2]}
-        ];
+      //弹出模态框,页面bug,理论上不应该这么做
+      this.isEdit = true;
+      this.show = true;
+
+        //不能直接给this.selectedGoods赋值,在这赋值以后GoodsForm会监控到oldGoods发生变化了
+        // this.selectedGoods = item;
+        // const names = item.categoryName.split("/");
+        // this.selectedGoods.categories = [
+        //   {id: item.cid1, name: names[0]},
+        //   {id: item.cid2, name: names[1]},
+        //   {id: item.cid3, name: names[2]}
+        // ];
+
+        //列表中传输过来的数据
+        let obj = item;
         // 查询商品详情
-        this.$http.get("/item/goods/spu/detail/" + item.id)
-          .then(resp => {
-            this.selectedGoods.spuDetail = resp.data;
-            this.selectedGoods.spuDetail.specTemplate = JSON.parse(resp.data.specTemplate);
-            this.selectedGoods.spuDetail.specifications = JSON.parse(resp.data.specifications);
-          })
-        this.isEdit = true;
-        this.show = true;
+        this.$http.get("goods/getSpuDetailById",{
+          params:{
+            spuId: item.id
+          }
+        }).then(resp => {
+            //准备分类需要回显的数据
+            obj.categories = [];
+            //商品详情
+            obj.spuDetail = resp.data.data;
+            //特殊规格数据
+            obj.spuDetail.specTemplate = resp.data.specialSpec;
+            //通用规格数据
+            obj.spuDetail.specifications = resp.data.genericSpec;
+            //查询sku
+            this.$http.get("goods/getSkuBySpuId",{
+              params:{
+                spuId: item.id
+              }
+            }).then(resp =>{
+    
+                obj.skus = resp.data.data;
+                //需要回显的数据
+                this.selectedGoods = obj;//最后再给selectedGoods赋值
+            }).catch(error => console.log(error))
+          }).catch(error => console.log(error))
       },
       deleteItem(id) {
         this.$message.confirm('此操作将永久删除该商品, 是否继续?')
           .then(() => {
             // 发起删除请求
-            this.$http.delete("/item/goods?id=" + id)
-              .then(() => {
-                // 删除成功，重新加载数据
-                this.getDataFromApi();
-                this.$message.info('删除成功!');
+            this.$http.delete("goods/deleteGoods?spuId=" + id)
+              .then(resp => {
+                if(resp.data.code == 200){
+                  // 删除成功，重新加载数据
+                  this.getDataFromApi();
+                  this.$message.info('删除成功!');
+                }      
               })
           })
           .catch(() => {
@@ -212,7 +263,6 @@
             title: this.search.key
           }
         }).then(resp =>{
-          console.log(resp)
           if(resp.data.code == 200){
             this.items = resp.data.data;
             this.totalItems = resp.data.message;

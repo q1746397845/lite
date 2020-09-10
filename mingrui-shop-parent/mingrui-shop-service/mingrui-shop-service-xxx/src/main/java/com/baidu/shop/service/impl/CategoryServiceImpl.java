@@ -6,9 +6,11 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.mapper.CategoryBrandMapper;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.mapper.SpecGroupMapper;
+import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.util.ObjectUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,9 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Resource
     private SpecGroupMapper specGroupMapper;
+
+    @Resource
+    private SpuMapper spuMapper;
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
@@ -94,37 +99,42 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         }
 
 
+        //判断分类有没有被商品绑定
+        Example spuEntityExample = new Example(SpuEntity.class);
+        spuEntityExample.createCriteria().andEqualTo("cid3",id);
+        List<SpuEntity> spuList = spuMapper.selectByExample(spuEntityExample);
+        if(spuList.size() > 0){
+            StringBuffer goodsTitle = new StringBuffer();
+            spuList.stream().forEach(spu ->{
+                goodsTitle.append(" "+ spu.getTitle() +" ");
+            });
+            return this.setResultError("当前节点下有商品: " + goodsTitle + ",不能被删除");
+        }
 
+
+        //判断有没有被品牌绑定
+        List<BrandEntity> BrandList = categoryBrandMapper.getBrandByCategoryId(id);
+
+        if(BrandList.size() > 0){
+            StringBuilder brandName = new StringBuilder();
+            BrandList.forEach(brand ->{
+                brandName.append(" "+  brand.getName() + " ");
+            });
+            return this.setResultError("当前节点被"+ brandName +"品牌绑定,不能被删除");
+        }
 
 
         //判断有没有被规格组绑定
         List<SpecGroupEntity> groupList = specGroupMapper.getGroupByCategoryId(id);
         if(groupList.size() > 0){
 
-            StringBuilder stringBuilder = new StringBuilder();
-
+            StringBuilder groupName = new StringBuilder();
             groupList.forEach(group ->{
-                stringBuilder.append(" " + group.getName() + " ");
+                groupName.append(" " + group.getName() + " ");
+
             });
-
-            return this.setResultError("当前节点下有"+ stringBuilder + "规格组,不能被删除");
+            return this.setResultError("当前节点下有"+ groupName + "规格组,不能被删除");
         }
-
-        //判断有没有被品牌绑定
-        //如果被绑定了,被哪个品牌绑定
-        List<BrandEntity> BrandList = categoryBrandMapper.getBrandByCategoryId(id);
-
-        if(BrandList.size() > 0){
-
-            StringBuilder stringBuilder = new StringBuilder();
-
-            BrandList.forEach(brand ->{
-                stringBuilder.append(" "+  brand.getName() + " ");
-            });
-
-            return this.setResultError("当前节点被"+ stringBuilder +"品牌绑定,不能被删除");
-        }
-
 
 
         //构建条件查询,通过当前节点的pid查询数据

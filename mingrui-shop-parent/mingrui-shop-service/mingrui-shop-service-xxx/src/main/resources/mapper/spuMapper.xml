@@ -36,7 +36,6 @@
                 desc
             </if>
         </if>
-
         <if test="page != null and rows != null">
             limit #{page},#{rows}
         </if>
@@ -48,7 +47,7 @@
         <if test="saleable != null and saleable != 2">
             and saleable = #{saleable}
         </if>
-        <if test="title != null">
+        <if test="title != null and title != ''">
             and title like CONCAT("%",#{title},"%")
         </if>
     </select>

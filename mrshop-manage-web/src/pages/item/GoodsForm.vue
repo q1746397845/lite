@@ -203,8 +203,15 @@ export default {
             indexes,
             enable,
             title, // 基本属性
-            //images: images ? images.join(",") : '', // 图片
-            images: images ? images.map(i => i.data).join(",") : '', // 图片
+            images: images ? images.map(i => {
+              if(i.data != undefined){
+                return i.data;
+              }
+              return i
+            }).join(",") : '', // 图片
+
+            //images: images ? images.map(i => i.data).join(",") : '',
+            
             ownSpec: JSON.stringify(obj) // 特有规格参数
           };
         });
@@ -216,18 +223,17 @@ export default {
       });
       goodsParams.spuDetail.genericSpec = JSON.stringify(specs);
       goodsParams.spuDetail.specialSpec = JSON.stringify(specTemplate);
-      console.log(JSON.stringify(goodsParams));
+      //console.log(JSON.stringify(goodsParams));
       this.$http({
         method: this.isEdit ? "put" : "post",
         url: "goods/saveGoods",
         data: goodsParams
       })
         .then(resp => {
-          console.log(resp)
-          // 成功，关闭窗口
-          this.$emit("close");
+          // 成功，关闭窗口,刷新列表
+          this.$emit("closeForm");
           // 提示成功
-          this.$message.success("保存成功了");
+          this.$message.success("保存成功了");          
         })
         .catch(() => {
           this.$message.error("保存失败！");
@@ -253,16 +259,23 @@ export default {
           this.specs = [];
           this.specialSpecs = [];
         } else {
+          //深拷贝
           this.goods = Object.deepCopy(val);
-
           // 先得到分类名称
-          const names = val.cname.split("/");
+          const names = val.categoryName.split("/");
           // 组织商品分类数据
-          this.goods.categories = [
-            { id: val.cid1, name: names[0] },
-            { id: val.cid2, name: names[1] },
-            { id: val.cid3, name: names[2] }
-          ];
+          setTimeout(() => {
+            this.goods.categories = [
+              { id: val.cid1, name: names[0] },
+              { id: val.cid2, name: names[1] },
+              { id: val.cid3, name: names[2] }
+            ]; 
+          },100);
+          // this.goods.categories = [
+          //   { id: val.cid1, name: names[0] },
+          //   { id: val.cid2, name: names[1] },
+          //   { id: val.cid3, name: names[2] }
+          // ];
 
           // 将skus处理成map
           const skuMap = new Map();
@@ -285,7 +298,6 @@ export default {
                 categoryId:this.goods.categories[2].id
               }
             }).then(resp => {
-              console.log(resp)
               this.brandOptions = resp.data.data;
             }).catch(error => console.log(error));
           // 根据分类查询规格参数
@@ -295,7 +307,6 @@ export default {
                 cid:this.goods.categories[2].id
               }
             }).then(resp => {
-              console.log(resp)
               let specs = [];
               let template = [];
               if (this.isEdit){
@@ -358,7 +369,7 @@ export default {
                       price: this.$format(price),
                       stock,
                       enable,
-                      images: images ? images.split(",") : [],
+                      images: images ? images.split(","): [],
                     });
                   }
                 }
