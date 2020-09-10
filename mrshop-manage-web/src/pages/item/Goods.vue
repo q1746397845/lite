@@ -265,7 +265,7 @@
         }).then(resp =>{
           if(resp.data.code == 200){
             this.items = resp.data.data;
-            this.totalItems = resp.data.message;
+            this.totalItems = resp.data.message - 0;
             this.loading = false;
           }   
         }).catch(error =>console.log(error))

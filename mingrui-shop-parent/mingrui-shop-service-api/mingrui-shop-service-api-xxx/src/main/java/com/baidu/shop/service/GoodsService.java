@@ -19,7 +19,7 @@ public interface GoodsService {
 
     @ApiOperation("获取spu信息")
     @GetMapping(value = "goods/getSpuInfo")
-    public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO);
+    public Result<List<JSONObject>> getSpuInfo(SpuDTO spuDTO);
 
     @ApiOperation("新建商品")
     @PostMapping(value = "goods/saveGoods")

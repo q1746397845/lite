@@ -13,6 +13,7 @@ import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.util.BaiduBeanUtil;
 import com.baidu.shop.util.ObjectUtil;
 import com.baidu.shop.util.StringUtil;
+import com.github.pagehelper.IPage;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -155,19 +156,21 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //代码简化
     //通过一条sql语句直接干上边的事
     @Override
-    public Result<PageInfo<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
-
+    public Result<List<JSONObject>> getSpuInfo(SpuDTO spuDTO) {
 
         //处理下分页信息,前台每次传来的 1,5  2,5  3,5...............,所有得处理下
         if(ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
             spuDTO.setPage((spuDTO.getPage()-1) * spuDTO.getRows());
         }
 
+
+
         List<SpuDTO> listDTO = spuMapper.getSpuDTO(spuDTO);
 
         Integer total = spuMapper.count(spuDTO);
 
         return this.setResult(HTTPStatus.OK,"" + total, listDTO);
+
     }
 
 
