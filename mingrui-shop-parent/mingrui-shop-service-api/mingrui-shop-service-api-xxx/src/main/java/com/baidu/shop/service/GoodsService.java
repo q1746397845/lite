@@ -46,5 +46,5 @@ public interface GoodsService {
 
     @PutMapping(value = "goods/updateSaleable")
     @ApiOperation("控制商品上下架状态")
-    public Result<List<SkuDTO>> updateSaleable(@RequestBody SpuEntity spuEntity);
+    public Result<List<SkuDTO>> updateSaleable(@RequestBody SpuDTO spuDTO);
 }

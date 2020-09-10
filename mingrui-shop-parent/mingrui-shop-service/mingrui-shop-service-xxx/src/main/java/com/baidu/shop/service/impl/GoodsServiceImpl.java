@@ -158,7 +158,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Override
     public Result<List<JSONObject>> getSpuInfo(SpuDTO spuDTO) {
 
-        //处理下分页信息,前台每次传来的 1,5  2,5  3,5...............,所有得处理下
+        //处理下分页信息,前台每次传来的 1,5  2,5  3,5............,所有得处理下
         if(ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
             spuDTO.setPage((spuDTO.getPage()-1) * spuDTO.getRows());
         }
@@ -328,11 +328,21 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //控制商品上下架
     @Override
     @Transactional
-    public Result<List<SkuDTO>> updateSaleable( SpuEntity spuEntity) {
-        if(ObjectUtil.isNotNull(spuEntity.getSaleable()) && (spuEntity.getSaleable() == 0 || spuEntity.getSaleable() == 1)){
+    public Result<List<SkuDTO>> updateSaleable(SpuDTO spuDTO) {
+
+        //只修改上下架
+        if(ObjectUtil.isNotNull(spuDTO.getId())
+                && ObjectUtil.isNotNull(spuDTO.getSaleable())
+                && (spuDTO.getSaleable() == 0 || spuDTO.getSaleable() == 1)){
+
+            SpuEntity spuEntity = new SpuEntity();
+            spuEntity.setId(spuDTO.getId());
+            spuEntity.setSaleable(spuDTO.getSaleable());
+
             spuMapper.updateByPrimaryKeySelective(spuEntity);
             return this.setResultSuccess();
         }
+
         return this.setResultError("操作失败");
     }
 }
