@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: xxx-service
+    name: xxx-server
   # 配置数据源
   datasource:
     # 数据源名称，任意

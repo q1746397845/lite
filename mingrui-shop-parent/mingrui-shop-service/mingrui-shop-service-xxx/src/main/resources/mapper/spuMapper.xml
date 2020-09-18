@@ -8,18 +8,18 @@
         <result column="cid1" property="cid1" jdbcType="INTEGER"/>
         <result column="cid2" property="cid2" jdbcType="INTEGER"/>
         <result column="cid3" property="cid3" jdbcType="INTEGER"/>
-        <result column="Brand_id" property="BrandId" jdbcType="INTEGER"/>
+        <result column="brandId" property="brandId" jdbcType="INTEGER"/>
         <result column="saleable" property="saleable" jdbcType="INTEGER"/>
         <result column="valid" property="valid" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="lastUpdate_time" property="lastUpdateTime" jdbcType="TIMESTAMP"/>
+        <result column="last_update_time" property="lastUpdateTime" jdbcType="TIMESTAMP"/>
         <result column="brandName" property="brandName" jdbcType="VARCHAR"/>
         <result column="categoryName" property="categoryName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="getSpuDTO" parameterType="com.baidu.shop.dto.SpuDTO" resultMap="BaseResultMap">
         SELECT
-        s.*,b.name as brandName,GROUP_CONCAT(c.name separator '/') as categoryName
+        s.*,b.id as brandId,b.name as brandName,GROUP_CONCAT(c.name separator '/') as categoryName
         from tb_category c,tb_brand b,tb_spu s
         where c.id in(s.cid1,s.cid2,s.cid3)
         and b.id = s.brand_id

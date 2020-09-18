@@ -8,11 +8,14 @@ spring:
 zuul:
   # 声明路由
   routes:
+    api-search:
+      path: /api-search/**
+      serviceId: search-server
     # 路由名称
     api-xxx:
       # 声明将所有以/api-xxx/的请求都转发到xxx-service的服务中
       path: /api-xxx/**
-      serviceId: xxx-service
+      serviceId: xxx-server
   # 启用重试
   retryable: true
 

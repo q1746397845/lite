@@ -101,7 +101,6 @@
     },
     data() {
       return {
-        state:'',//提醒用户上下架
         search: {
           key: '',
           saleable: 1,
@@ -148,19 +147,16 @@
           saleable:saleableState
         }
         ).then(resp =>{
-          if(resp.data.code == 200){
-            
+          if(resp.data.code == 200){ 
             if(saleableState == 0){
-              this.state = "下架成功";
+              this.$message.success("下架成功");
             }else if(saleableState == 1){
-              this.state = "上架成功";
+              this.$message.success("上架成功");
             }
-            this.$message.success(this.state); 
             //刷新列表
             this.getDataFromApi();
           }else if(resp.data.code == 500){
-            this.state = "操作失败";
-            this.$message.error(this.state); 
+            this.$message.error("操作失败"); 
           }
         }).catch(error => console.log(error))
       },

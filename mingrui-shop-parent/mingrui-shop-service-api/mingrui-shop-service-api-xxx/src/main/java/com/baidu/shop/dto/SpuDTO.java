@@ -49,7 +49,7 @@ public class SpuDTO extends BaseDTO {
 
     @ApiModelProperty(value = "商品所属品牌id",example = "1")
     @NotNull(message = "商品所属品牌id不能为空",groups = {MingruiOperation.Add.class})
-    private Integer BrandId;
+    private Integer brandId;
 
     @ApiModelProperty(value = "是否上架,0下架,1上架",example = "1")
     private Integer saleable;

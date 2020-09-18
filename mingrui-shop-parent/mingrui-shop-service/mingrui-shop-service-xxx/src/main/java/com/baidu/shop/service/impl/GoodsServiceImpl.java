@@ -3,7 +3,6 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.entity.*;
@@ -13,19 +12,13 @@ import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.util.BaiduBeanUtil;
 import com.baidu.shop.util.ObjectUtil;
 import com.baidu.shop.util.StringUtil;
-import com.github.pagehelper.IPage;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.corba.se.spi.ior.ObjectAdapterId;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -156,14 +149,12 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //代码简化
     //通过一条sql语句直接干上边的事
     @Override
-    public Result<List<JSONObject>> getSpuInfo(SpuDTO spuDTO) {
+    public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
 
         //处理下分页信息,前台每次传来的 1,5  2,5  3,5............,所有得处理下
         if(ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
             spuDTO.setPage((spuDTO.getPage()-1) * spuDTO.getRows());
         }
-
-
 
         List<SpuDTO> listDTO = spuMapper.getSpuDTO(spuDTO);
 
@@ -255,15 +246,17 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //删除商品
     @Override
     public Result<List<JSONObject>> deleteGoods(Integer spuId) {
-        //删除 spu
-        spuMapper.deleteByPrimaryKey(spuId);
-        //删除spuDetail
-        spuDetailMapper.deleteByPrimaryKey(spuId);
+        if(ObjectUtil.isNotNull(spuId)){
+            //删除 spu
+            spuMapper.deleteByPrimaryKey(spuId);
+            //删除spuDetail
+            spuDetailMapper.deleteByPrimaryKey(spuId);
+            //删除sku和stock
+            this.deleteSkusAndStocks(spuId);
 
-        //删除sku和stock
-        this.deleteSkusAndStocks(spuId);
-
-        return this.setResultSuccess();
+            return this.setResultSuccess();
+        }
+        return this.setResultError("操作失败");
     }
 
     //通过spuId查询spuDetail
@@ -308,19 +301,22 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     //删除sku和stock方法
     @Transactional
     void deleteSkusAndStocks(Integer spuId){
-        Example example = new Example(SkuEntity.class);
-        example.createCriteria().andEqualTo("spuId",spuId);
-        List<SkuEntity> skuEntityList = skuMapper.selectByExample(example);
 
-        List<Long> skuIdList = skuEntityList.stream().map(skuEntity -> {
-            return skuEntity.getId();
-        }).collect(Collectors.toList());
+        if(ObjectUtil.isNotNull(spuId)){
+            Example example = new Example(SkuEntity.class);
+            example.createCriteria().andEqualTo("spuId",spuId);
+            List<SkuEntity> skuEntityList = skuMapper.selectByExample(example);
 
-        if(skuIdList.size() > 0){
-            //删除sku
-            skuMapper.deleteByIdList(skuIdList);
-            //删除stock
-            stockMapper.deleteByIdList(skuIdList);
+            List<Long> skuIdList = skuEntityList.stream().map(skuEntity -> {
+                return skuEntity.getId();
+            }).collect(Collectors.toList());
+
+            if(skuIdList.size() > 0){
+                //删除sku
+                skuMapper.deleteByIdList(skuIdList);
+                //删除stock
+                stockMapper.deleteByIdList(skuIdList);
+            }
         }
     }
 
