@@ -23,6 +23,7 @@ import tk.mybatis.mapper.entity.Example;
 
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -224,5 +225,17 @@ public class BrandServiceImpl  extends BaseApiService implements BrandService {
         }
 
         return this.setResultError("没查到");
+    }
+
+
+    @Override
+    public Result<List<BrandEntity>> getBrandByBrandIds(String brandIds) {
+        List<Integer> brandIdsArr = Arrays.asList(brandIds.split(",")).stream().map(brandId -> {
+            return Integer.parseInt(brandId);
+        }).collect(Collectors.toList());
+
+        List<BrandEntity> list = brandMapper.selectByIdList(brandIdsArr);
+
+        return this.setResultSuccess(list);
     }
 }

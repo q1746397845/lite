@@ -23,6 +23,9 @@
         from tb_category c,tb_brand b,tb_spu s
         where c.id in(s.cid1,s.cid2,s.cid3)
         and b.id = s.brand_id
+        <if test="id != null and id != 0 ">
+            and s.id = #{id}
+        </if>
         <if test="saleable != null and saleable != 2">
             and s.saleable = #{saleable}
         </if>

@@ -12,14 +12,14 @@ eurerka:
 
 
 
-fdfs:
-  so-timeout: 1501
-  connect-timeout: 601
-  thumb-image: # 缩略图
-    width: 60
-    height: 60
-  tracker-list: # tracker地址
-    - 119.45.207.193:22122
+#fdfs:
+#  so-timeout: 1501
+#  connect-timeout: 601
+#  thumb-image: # 缩略图
+#    width: 60
+#    height: 60
+#  tracker-list: # tracker地址
+#    - 119.45.207.193:22122
 
 mingrui:
   upload:
@@ -27,4 +27,5 @@ mingrui:
       windows: G:\\images
       linux: /lite/images
     img:
-      host: http://119.45.207.193/
+      #host: http://119.45.207.193/
+      host: http://image.mrshop.com

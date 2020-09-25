@@ -106,11 +106,19 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
         if(ObjectUtil.isNotNull(specParamDTO.getGroupId())){
             criteria .andEqualTo("groupId", specParamDTO.getGroupId());
         }
-        //通过分类id查询
+
         if(ObjectUtil.isNotNull(specParamDTO.getCid())){
             criteria.andEqualTo("cid",specParamDTO.getCid());
         }
 
+        if(ObjectUtil.isNotNull(specParamDTO.getSearching())){
+            criteria.andEqualTo("searching",specParamDTO.getSearching());
+        }
+        if(ObjectUtil.isNotNull(specParamDTO.getGeneric())){
+            criteria.andEqualTo("generic",specParamDTO.getGeneric());
+        }
+
+        System.out.println(specParamDTO);
         List<SpecParamEntity> list = specParamMapper.selectByExample(example);
 
 

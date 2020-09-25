@@ -81,7 +81,7 @@
             <div class="subheading">{{spec.name}}:</div>
             <!--特有参数的待选项，需要判断是否有options，如果没有，展示文本框，让用户自己输入-->
             <v-card-text class="px-5">
-              <div v-for="i in spec.options.length+1" :key="i" class="layout row px-5">
+              <div  v-for="i in spec.options.length+1" :key="i" class="layout row px-5">
                 <v-text-field :placeholder="'新的' + spec.name + ':'" class="flex xs10" auto-grow
                               v-model="spec.options[i-1]" v-bind:value="i" single-line hide-details/>
 
@@ -298,7 +298,10 @@ export default {
                 categoryId:this.goods.categories[2].id
               }
             }).then(resp => {
-              this.brandOptions = resp.data.data;
+              if(resp.data.code == 200){
+                this.brandOptions = resp.data.data;
+              }
+              
             }).catch(error => console.log(error));
           // 根据分类查询规格参数
           this.$http

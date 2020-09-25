@@ -54,12 +54,12 @@
         .top-pagination span {
             margin-right: 10px;
         }
-/*        .logo-list li{
+       .logo-list li{
             padding:8px;
         }
        .logo-list li:hover{
             background-color: #f3f3f3;
-        }*/
+        }
         .type-list a:hover{
             color: #1299ec;
         }
@@ -99,34 +99,33 @@
         <div class="bread">
             <!--面包屑-->
             <ul class="fl sui-breadcrumb">
-                <li><span>全部结果:</span></li>
-                <li ><a href="#">手机</a></li>
-                <li ><span>手机通讯</span></li>
+                <li><span>全部结果: ></span></li>
+                <!-- <li ><a href="#">手机</a></li> -->
+                <!-- <li ><span>手机通讯</span></li> -->
             </ul>
             <!--已选择过滤项-->
-            <ul class="tags-choose">
+            <ul class="tags-choose" v-for="(value,key,index) in filter" :key="index">
                 <li class="tag">
-                    品牌:<span style="color: red">apple</span>
-                    <i class="sui-icon icon-tb-close"></i>
-                </li>
-                <li class="tag">
-                    内存:<span style="color: red">4G</span>
-                    <i class="sui-icon icon-tb-close"></i>
+                    {{key == "brandId" ? "品牌" : key == "cid3" ? "分类" : key}}:
+                    <span style="color: red">{{ getFilterValue(key,value) }}</span>
+                    <i class="sui-icon icon-tb-close" @click="deleteFilter(key)"></i>
                 </li>
             </ul>
+
+            <ul class="fl sui-breadcrumb">
+                <li>"{{ search }}"</li>
+            </ul>
+
             <div class="clearfix"></div>
         </div>
         <!--selector-->
         <div class="clearfix selector">
             <div class="type-wrap">
                 <div class="fl key">分类</div>
-                <div class="fl value">
-                    <ul class="type-list">
+                <div class="fl value" v-for="(category,index) in filters.categoryList" :key="index">
+                    <ul class="type-list" >
                         <li>
-                            <a>手机</a>
-                        </li>
-                        <li>
-                            <a>儿童手表</a>
+                            <a @click="addFilter('cid3',category.id)">{{ category.name }}</a>
                         </li>
                     </ul>
                 </div>
@@ -135,138 +134,38 @@
             <div class="type-wrap logo">
                 <div class="fl key brand">品牌</div>
                 <div class="value logos">
-                    <ul class="logo-list">
-                        <li><img src="img/_/phone01.png" /></li>
-                        <li><img src="img/_/phone02.png" /></li>
-                        <li><img src="img/_/phone03.png" /></li>
-                        <li><img src="img/_/phone04.png" /></li>
-                        <li><img src="img/_/phone05.png" /></li>
-                        <li><img src="img/_/phone06.png" /></li>
-                        <li><img src="img/_/phone07.png" /></li>
-                        <li><img src="img/_/phone08.png" /></li>
-                        <li><img src="img/_/phone09.png" /></li>
-                        <li><img src="img/_/phone10.png" /></li>
-                        <li><img src="img/_/phone11.png" /></li>
-                        <li><img src="img/_/phone12.png" /></li>
-                        <li><img src="img/_/phone13.png" /></li>
-                        <li><img src="img/_/phone14.png" /></li>
-                        <li><img src="img/_/phone05.png" /></li>
-                        <li><img src="img/_/phone06.png" /></li>
-                        <li><img src="img/_/phone07.png" /></li>
-                        <li style="text-align: center"><a style="line-height: 30px; font-size: 12px" href="#">xx</a></li>
+                    <ul class="logo-list"  v-for="(brand,index) in filters.brandList" :key="index">
+                        <li v-if="brand.image" @click="addFilter('brandId',brand.id)">
+                            <img :src="brand.image" />
+                        </li>
+                        <li v-else style="text-align: center" @click="addFilter('brandId',brand.id)"> 
+                            <a style="line-height: 36px; font-size: 12px" href="#">{{ brand.name }}</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="fl ext">
                     <a href="javascript:void(0);" class="sui-btn">多选</a>
                 </div>
             </div>
-            <div class="type-wrap">
-                <div class="fl key">网络制式</div>
-                <div class="fl value">
-                    <ul class="type-list">
+            <div v-show="(index < 5 || showMore) && key != 'brandList' && key != 'categoryList'" 
+                class="type-wrap" 
+                v-for="(value,key,index) in filters" 
+                :key="index">
+                <div  class="fl key">{{key}}</div>
+                <div class="fl value" v-if="v" v-for="(v,i) in value" :key="i">
+                    <ul class="type-list" >
                         <li>
-                            <a>GSM（移动/联通2G）</a>
-                        </li>
-                        <li>
-                            <a>电信2G</a>
-                        </li>
-                        <li>
-                            <a>电信3G</a>
-                        </li>
-                        <li>
-                            <a>移动3G</a>
-                        </li>
-                        <li>
-                            <a>联通3G</a>
-                        </li>
-                        <li>
-                            <a>联通4G</a>
-                        </li>
-                        <li>
-                            <a>电信3G</a>
-                        </li>
-                        <li>
-                            <a>移动3G</a>
-                        </li>
-                        <li>
-                            <a>联通3G</a>
-                        </li>
-                        <li>
-                            <a>联通4G</a>
+                            <a @click="addFilter(key,v)">{{ v }}</a>
                         </li>
                     </ul>
                 </div>
                 <div class="fl ext"></div>
-            </div>
-            <div class="type-wrap">
-                <div class="fl key">显示屏尺寸</div>
-                <div class="fl value">
-                    <ul class="type-list">
-                        <li>
-                            <a>4.0-4.9英寸</a>
-                        </li>
-                        <li>
-                            <a>4.0-4.9英寸</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="fl ext"></div>
-            </div>
-            <div class="type-wrap">
-                <div class="fl key">摄像头像素</div>
-                <div class="fl value">
-                    <ul class="type-list">
-                        <li>
-                            <a>1200万以上</a>
-                        </li>
-                        <li>
-                            <a>800-1199万</a>
-                        </li>
-                        <li>
-                            <a>1200-1599万</a>
-                        </li>
-                        <li>
-                            <a>1600万以上</a>
-                        </li>
-                        <li>
-                            <a>无摄像头</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="fl ext"></div>
-            </div>
-            <div class="type-wrap">
-                <div class="fl key">价格</div>
-                <div class="fl value">
-                    <ul class="type-list">
-                        <li>
-                            <a>0-500元</a>
-                        </li>
-                        <li>
-                            <a>500-1000元</a>
-                        </li>
-                        <li>
-                            <a>1000-1500元</a>
-                        </li>
-                        <li>
-                            <a>1500-2000元</a>
-                        </li>
-                        <li>
-                            <a>2000-3000元 </a>
-                        </li>
-                        <li>
-                            <a>3000元以上</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="fl ext">
-                </div>
             </div>
             <div class="type-wrap" style="text-align: center">
-                <v-btn small flat>
+                <v-btn small flat v-show="!showMore" @click="showMore = true">
                     更多<v-icon>arrow_drop_down</v-icon>
                 </v-btn>
-                <v-btn small="" flat>
+                <v-btn small="" flat v-show="showMore" @click="showMore = false">
                     收起<v-icon>arrow_drop_up</v-icon>
                 </v-btn>
             </div>
@@ -293,30 +192,37 @@
                         </li>
                     </ul>
                     <div class="top-pagination">
-                        <span>共 <i style="color: #222;">7600+</i> 商品</span>
-                        <span><i style="color: red;">2</i>/123</span>
-                        <a class="btn-arrow" href="#" style="display: inline-block">&lt;</a>
-                        <a class="btn-arrow" href="#" style="display: inline-block">&gt;</a>
+                        <span>共 <i style="color: #222;">{{total}}</i> 商品</span>
+                        <span><i style="color: red;">{{page}}</i>/{{totalPage}}</span>
+                        <a class="btn-arrow" href="#" style="display: inline-block" @click="deletePage()">&lt;</a>
+                        <a class="btn-arrow" href="#" style="display: inline-block" @click="addPage()">&gt;</a>
                     </div>
                 </div>
             </div>
             <div class="goods-list">
                 <ul class="yui3-g">
-                    <li class="yui3-u-1-5" v-for="(goods,index) in goodsList">
+                    <li class="yui3-u-1-5" v-for="(goods,index) in goodsList" :key="index">
                         <div class="list-wrap">
                             <div class="p-img">
-                                <a href="item.html" target="_blank"><img src="img/_/mobile01.png" height="200"/></a>
+                                <a :href="'item/'+ goods.id +'.html'" target="_blank">
+                                    <img :src="goods.selected.images" height="200"/>
+                                </a>
                                 <ul class="skus">
-                                    <li class="selected"><img src="img/_/mobile01.png"></li>
-                                    <li class=""><img src="img/_/mobile01.png"></li>
-                                    <li class=""><img src="img/_/mobile01.png"></li>
+                                    <!-- 判断当前sku是否是选中的数据 -->
+                                    <li :class="{selected: sku.id == goods.selected.id}"
+                                        v-for="(sku,index) in goods.skus"
+                                        :key="index"    
+                                        @mouseover="goods.selected = sku"                           
+                                    >
+                                        <img :src="sku.images">
+                                    </li>
                                 </ul>
                             </div>
                             <div class="clearfix"></div>
                             <div class="price">
                                 <strong>
                                     <em>¥</em>
-                                    <i>6088.00</i>
+                                    <i>{{mrshop.formatPrice(goods.selected.price)}}</i>
                                 </strong>
                             </div>
                             <div class="attr">
@@ -341,33 +247,28 @@
             <div class="fr">
                 <div class="sui-pagination pagination-large">
                     <ul>
-                        <li class="prev disabled">
-                            <a href="#">«上一页</a>
+                        <!--prev不变,disabled当前页等于小于1的时候将按钮禁用掉 -->
+                        <li :class="{prev:true,disabled:page <= 1}" >
+                            <a  @click="deletePage()">«上一页</a>
                         </li>
-                        <li class="active">
-                            <a href="#">1</a>
+                        <!-- :class="{active: i == page}"样式设置
+                            方法的参数哪个值小返回哪个
+                            v-for="(i,index) in Math.min(3,totalPage)"
+                        -->
+                        <li class="dotted" v-show="showPage > 5"><span>...</span></li>
+                        <li :class="{active: i == page}" v-for="(i,index) in Math.min(showPage,totalPage)" :key="index">
+                            <a  @click="page = i" v-show="i >= hidePage">{{ i }}</a>
                         </li>
-                        <li>
-                            <a href="#">2</a>
-                        </li>
-                        <li>
-                            <a href="#">3</a>
-                        </li>
-                        <li>
-                            <a href="#">4</a>
-                        </li>
-                        <li>
-                            <a href="#">5</a>
-                        </li>
-                        <li class="dotted"><span>...</span></li>
-                        <li class="next">
-                            <a href="#">下一页»</a>
+                        <!-- 如果总条数大于规定的就显示... -->
+                        <li class="dotted" v-show="totalPage > showPage"><span>...</span></li>
+                        <li :class="{prev:true,disabled:page >= totalPage}">
+                            <a  @click="addPage()">下一页»</a>
                         </li>
                     </ul>
-                    <div><span>共10页&nbsp;</span><span>
+                    <div><span>共{{ totalPage }}页&nbsp;</span><span>
       到第
-      <input type="text" class="page-num">
-      页 <button class="page-confirm" onclick="alert(1)">确定</button></span></div>
+      <input type="text" class="page-num" v-model="pages">
+      页 <button class="page-confirm" @click="selectPage()">确定</button></span></div>
                 </div>
             </div>
         </div>
@@ -464,28 +365,121 @@
     var vm = new Vue({
         el: "#searchApp",
         data: {
+            search:'',
             goodsList:[],//商品信息
             mrshop, //不将此参数绑定到当前页面上,html代码不能使用mrshop.***函数
+            total:0,//总条数
+            totalPage:0,//总页数
+            page:1,//当前页
+            pages:1,//用来跳转页面的
+            showPage:3,
+            hidePage:0,
+            brandList:'',
+            categoryList:'',
+            specAggInfo:{},
+            showMore:false,
+            filters:{},
+            filter:{}
         },
-
+        watch:{
+            //监控page的值,发生变化查询
+            page(){
+                this.searchEsData();  
+                this.pageStatus(); 
+            }
+        },
         components:{
         	b2cTop: () => import("./js/pages/top.js")
         },
+        methods:{
+            deleteFilter(key){
+                delete this.filter[key];
+                this.searchEsData();
+            },
+            getFilterValue(key,value){
+                if(key == "brandId"){
+                    this.filters.brandList.forEach(brand => {
+                        if(brand.id == value){
+                            value = brand.name;
+                        } 
+                    })
+                    return value;
+                }else if(key == "cid3"){
+                    this.filters.categoryList.forEach(category => {
+                        if(category.id == value){
+                            value = category.name;
+                        }      
+                    })
+                    return value;
+                }
+                return value;
+            },
+            addFilter(k,v){
+                this.filter[k] = v
+                this.searchEsData();
+            },
+            pageStatus(){
+                this.showPage = 2;
+                this.hidePage = -2;
+
+                this.showPage = this.showPage + this.page;
+                this.hidePage = this.hidePage + this.page;
+            },
+            selectPage(){
+                if(this.pages > this.totalPage || this.pages < 1){
+                    return alert("没有这一页");
+                }
+                this.page = this.pages - 0;
+
+            },
+            deletePage(){
+                if(this.page <= 1){
+                    return ;
+                }
+                this.page--;
+            },
+            addPage(){
+                if(this.page >= this.totalPage){
+                    return ;
+                }
+                this.page++;
+            },
+            searchEsData(){
+                // console.log(window.location.search)
+                // console.log(decodeURI(window.location.search))
+        
+                //获取要搜索内容
+                this.search = mrshop.getUrlParam("key");
+                mrshop.http.get("es/search",{
+                    params:{
+                        page:this.page,
+                        search:this.search,
+                        filter:JSON.stringify(this.filter)
+                    }
+                }).then(resp =>{
+                    if(resp.data.code == 200){
+                        const goodsList = resp.data.data.map(goods =>{
+                            goods.skus = JSON.parse(goods.skus);//将json字符串转换成对象
+                            goods.selected = goods.skus[0];//设置当前选中
+                            return goods;
+                        })
+                        this.goodsList = goodsList;
+                        this.total = resp.data.total;//总条数
+                        this.totalPage = resp.data.totalPage;//总页数
+                        // this.brandList = resp.data.brandList;
+                        // this.categoryList = resp.data.categoryList;
+                        // this.specAggInfo = resp.data.specAggInfo;
+
+                        this.filters.brandList = resp.data.brandList;
+                        this.filters.categoryList = resp.data.categoryList;
+                        //深拷贝,将resp.data.specAggInfo对象中的值拷贝到this.filters中
+                        Object.assign(this.filters,resp.data.specAggInfo);
+                    }
+                }).catch(error => console.log(error))
+            }
+        },
         created(){
-            console.log(window.location.search)
-            console.log(decodeURI(window.location.search))
-            
-            //获取要搜索内容
-            const search = mrshop.getUrlParam("key");
-            mrshop.http.get("es/search",{
-                params:{
-                    search
-                }
-            }).then(resp =>{
-                if(resp.data.code == 200){
-                    this.goodsList = resp.data.data
-                }
-            }).catch(error => console.log(error))
+            this.searchEsData();
         }
     });
 </script>

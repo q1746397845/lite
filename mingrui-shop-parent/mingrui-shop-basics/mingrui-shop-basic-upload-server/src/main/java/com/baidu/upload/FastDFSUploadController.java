@@ -25,7 +25,7 @@ import java.io.InputStream;
  * @Version V1.0
  **/
 @RestController
-@RequestMapping(value = "upload")
+@RequestMapping(value = "upload1")
 @Slf4j
 public class FastDFSUploadController {
     //图片服务器的地址
@@ -57,6 +57,10 @@ public class FastDFSUploadController {
         String path = thumbImageConfig.getThumbImagePath(storePath.getFullPath());
         log.info("缩略图路径:{}", path);
 
-        return new Result<String>(HTTPStatus.OK,"上传成功",imgHost + path);
+
+        String fullPath = storePath.getFullPath();
+
+
+        return new Result<String>(HTTPStatus.OK,"上传成功",imgHost + fullPath);
     }
 }

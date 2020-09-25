@@ -13,12 +13,15 @@ import com.baidu.shop.mapper.SpecGroupMapper;
 import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.util.ObjectUtil;
+import org.springframework.data.annotation.Id;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName CategoryServiceImpl
@@ -165,5 +168,17 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         List<CategoryEntity> catesByBrand = categoryBrandMapper.getCatesByBrandId(brandId);
 
         return this.setResultSuccess(catesByBrand);
+    }
+
+
+    @Override
+    public Result<List<CategoryEntity>> getCategoryByCategoryIds(String brandIds) {
+        List<Integer> brandIdList = Arrays.asList(brandIds.split(",")).stream().map(brandId -> {
+            return Integer.parseInt(brandId);
+        }).collect(Collectors.toList());
+
+        List<CategoryEntity> categoryList = categoryMapper.selectByIdList(brandIdList);
+
+        return this.setResultSuccess(categoryList);
     }
 }
