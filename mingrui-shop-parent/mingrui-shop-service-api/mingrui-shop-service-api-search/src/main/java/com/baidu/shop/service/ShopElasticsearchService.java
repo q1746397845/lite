@@ -1,15 +1,14 @@
 package com.baidu.shop.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.shop.DTO.SearchDTO;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.document.GoodsDoc;
 import com.baidu.shop.response.GoodsResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.annotation.Resource;
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @ClassName ShopElasticsearchService
@@ -29,11 +28,19 @@ public interface ShopElasticsearchService {
     @ApiOperation(value = "初始化es数据")
     Result<JSONObject> initEsData();
 
+    @GetMapping(value = "es/saveEsData")
+    @ApiOperation(value = "新增es数据")
+    Result<JSONObject> saveEsData(@RequestParam Integer spuId);
+
     @GetMapping(value = "es/clearEsData")
     @ApiOperation(value = "清空es中的商品数据")
     Result<JSONObject> clearEsData();
 
     @GetMapping(value = "es/search")
     @ApiOperation(value = "搜索")
-    GoodsResponse search(String search, Integer page,String filter);
+    GoodsResponse search(SearchDTO searchDTO);
+
+    @GetMapping(value = "es/deleteEsData")
+    @ApiOperation(value = "删除es中的商品数据")
+    Result<JSONObject> deleteEsData(@RequestParam Integer spuId);
 }

@@ -301,7 +301,6 @@ export default {
               if(resp.data.code == 200){
                 this.brandOptions = resp.data.data;
               }
-              
             }).catch(error => console.log(error));
           // 根据分类查询规格参数
           this.$http
@@ -310,6 +309,7 @@ export default {
                 cid:this.goods.categories[2].id
               }
             }).then(resp => {
+              console.log(this.goods.categories[2].id)
               let specs = [];
               let template = [];
               if (this.isEdit){

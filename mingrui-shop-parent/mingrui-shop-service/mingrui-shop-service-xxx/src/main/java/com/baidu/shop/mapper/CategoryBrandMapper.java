@@ -1,7 +1,7 @@
 package com.baidu.shop.mapper;
 
-import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.special.InsertListMapper;

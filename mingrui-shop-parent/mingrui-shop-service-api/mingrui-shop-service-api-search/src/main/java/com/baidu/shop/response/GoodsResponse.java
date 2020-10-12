@@ -1,7 +1,7 @@
 package com.baidu.shop.response;
 
-import com.baidu.shop.base.Result;
 import com.baidu.shop.document.GoodsDoc;
+import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.status.HTTPStatus;

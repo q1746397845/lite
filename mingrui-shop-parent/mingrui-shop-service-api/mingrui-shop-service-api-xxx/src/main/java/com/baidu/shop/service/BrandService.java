@@ -1,10 +1,9 @@
 package com.baidu.shop.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
+import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
-import com.baidu.shop.util.JSONUtil;
 import com.baidu.shop.validate.group.MingruiOperation;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;

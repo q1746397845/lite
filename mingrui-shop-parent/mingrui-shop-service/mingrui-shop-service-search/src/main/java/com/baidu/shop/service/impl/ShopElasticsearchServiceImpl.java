@@ -1,6 +1,7 @@
 package com.baidu.shop.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.shop.DTO.SearchDTO;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.document.GoodsDoc;
@@ -12,14 +13,15 @@ import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpecParamEntity;
 import com.baidu.shop.entity.SpuDetailEntity;
 import com.baidu.shop.feign.BrandFeign;
-import com.baidu.shop.feign.CategoryFeign;
 import com.baidu.shop.feign.GoodsFeign;
 import com.baidu.shop.feign.SpecificationFeign;
 import com.baidu.shop.response.GoodsResponse;
 import com.baidu.shop.service.ShopElasticsearchService;
+import com.baidu.shop.feign.CategoryFeign;
 import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.util.ESHighLightUtil;
 import com.baidu.shop.util.JSONUtil;
+import com.baidu.shop.util.ObjectUtil;
 import com.baidu.shop.util.StringUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -66,19 +68,21 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     @Autowired
     private CategoryFeign categoryFeign;
 
+
+
+
     /**
      * es查询
-     * @param search
-     * @param page
+     * @param searchDTO
      * @return
      */
     @Override
-    public GoodsResponse search(String search,Integer page,String filter) {
+    public GoodsResponse search(SearchDTO searchDTO) {
 
-        if(StringUtil.isEmpty(search)) new RuntimeException("没有值");
+        if(StringUtil.isEmpty(searchDTO.getSearch())) new RuntimeException("没有值");
 
         //构建条件
-        NativeSearchQueryBuilder queryBuilder = this.getQueryBuilder(search,page,filter);
+        NativeSearchQueryBuilder queryBuilder = this.getQueryBuilder(searchDTO.getSearch(),searchDTO.getPage(),searchDTO.getFilter());
 
         //将条件放进去查询
         SearchHits<GoodsDoc> hits = elasticsearchRestTemplate.search(queryBuilder.build(), GoodsDoc.class);
@@ -117,7 +121,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
 
         //通过分类id 查询 规格参数
         //specAggInfo 里的key是 规格参数的name ,value是具体的规格参数
-        Map<String, List<String>> specAggInfo = this.getSpecAggInfo(hotCid, search);
+        Map<String, List<String>> specAggInfo = this.getSpecAggInfo(hotCid, searchDTO.getSearch());
 
         GoodsResponse goodsResponse = new GoodsResponse(total,totalPage,brandList,categoryList,goodsDocs,specAggInfo);
 
@@ -217,7 +221,6 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
             queryBuilder.withFilter(boolQueryBuilder);
         }
 
-
         //多个字段同时查询
         MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(search, "title", "brandName", "categoryName");
 
@@ -295,24 +298,51 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         return brandResult.getData();
     }
 
+
     /**
      * 初始化es数据
      * @return
      */
     @Override
     public Result<JSONObject> initEsData() {
+
+        //这样不会使用到ik分词器 有bug
         IndexOperations indexOperations = elasticsearchRestTemplate.indexOps(GoodsDoc.class);
-        if(!indexOperations.exists()){
+        if (!indexOperations.exists()) {
             indexOperations.create();
             System.out.println("创建索引成功");
             indexOperations.createMapping();
             System.out.println("创建映射成功");
         }
-
+//        elasticsearchRestTemplate.createIndex(GoodsDoc.class);
+//        elasticsearchRestTemplate.putMapping(GoodsDoc.class);
         //批量新增数据
-        List<GoodsDoc> goodsDocs = this.esGoodsInfo();
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(null);
         elasticsearchRestTemplate.save(goodsDocs);
+
         return this.setResultSuccess();
+    }
+
+    //新增一条数据到es库
+    @Override
+    public Result<JSONObject> saveEsData(Integer spuId) {
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(spuId);
+        elasticsearchRestTemplate.save(goodsDocs);;
+        return this.setResultSuccess();
+    }
+
+    //删除一条数据
+    @Override
+    public Result<JSONObject> deleteEsData(Integer spuId) {
+
+        if(ObjectUtil.isNotNull(spuId)){
+            GoodsDoc goodsDoc = new GoodsDoc();
+            goodsDoc.setId(spuId.longValue());
+            elasticsearchRestTemplate.delete(goodsDoc);
+            return this.setResultSuccess();
+        }
+
+        return this.setResultError("删除es库失败");
     }
 
     /**
@@ -329,9 +359,12 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         return this.setResultSuccess();
     }
 
-    private List<GoodsDoc> esGoodsInfo() {
+    private List<GoodsDoc> esGoodsInfo(Integer spuId) {
 
         SpuDTO spuDTO = new SpuDTO();
+        if(ObjectUtil.isNotNull(spuId)){
+            spuDTO.setId(spuId);
+        }
 
         Result<List<SpuDTO>> spuInfo = goodsFeign.getSpuInfo(spuDTO);
 

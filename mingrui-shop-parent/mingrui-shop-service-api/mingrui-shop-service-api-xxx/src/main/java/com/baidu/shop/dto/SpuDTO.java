@@ -1,13 +1,10 @@
 package com.baidu.shop.dto;
 
 import com.baidu.shop.validate.group.MingruiOperation;
-import com.sun.rowset.internal.BaseRow;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;

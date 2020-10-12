@@ -1,9 +1,7 @@
 package com.baidu.shop.mapper;
 
 import com.baidu.shop.dto.SpuDTO;
-import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.SpuEntity;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 

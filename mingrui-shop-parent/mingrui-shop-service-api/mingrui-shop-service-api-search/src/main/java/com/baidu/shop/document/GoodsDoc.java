@@ -24,13 +24,16 @@ public class GoodsDoc {
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text,analyzer = "ik_max_word")
+    //@Field(type = FieldType.Text,analyzer = "pinyin",searchAnalyzer = "pinyin")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")
     private String title;
 
-    @Field(type = FieldType.Text,analyzer = "ik_max_word")
+    //@Field(type = FieldType.Text,analyzer = "pinyin",searchAnalyzer = "pinyin")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")
     private String brandName;
 
-    @Field(type = FieldType.Text,analyzer = "ik_max_word")
+    //@Field(type = FieldType.Text,analyzer = "pinyin",searchAnalyzer = "pinyin")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")
     private String categoryName;
 
     @Field(type = FieldType.Keyword, index = false)

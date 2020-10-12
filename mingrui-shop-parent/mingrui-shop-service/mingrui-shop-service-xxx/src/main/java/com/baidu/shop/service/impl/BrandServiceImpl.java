@@ -1,19 +1,19 @@
 package com.baidu.shop.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
-import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
 import com.baidu.shop.entity.SpuEntity;
+import com.baidu.shop.mapper.SpuMapper;
+import com.baidu.shop.base.Result;
+import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.mapper.BrandMapper;
 import com.baidu.shop.mapper.CategoryBrandMapper;
-import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.BrandService;
+import com.baidu.shop.util.StringUtil;
 import com.baidu.shop.util.BaiduBeanUtil;
 import com.baidu.shop.util.ObjectUtil;
 import com.baidu.shop.util.PinyinUtil;
-import com.baidu.shop.util.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +23,6 @@ import tk.mybatis.mapper.entity.Example;
 
 
 import javax.annotation.Resource;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

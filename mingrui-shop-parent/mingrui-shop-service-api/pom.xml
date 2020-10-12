@@ -16,6 +16,7 @@
     <modules>
         <module>mingrui-shop-service-api-xxx</module>
         <module>mingrui-shop-service-api-search</module>
+        <module>mingrui-shop-service-api-template</module>
     </modules>
 
     <dependencies>
@@ -55,7 +56,6 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.10</version>
         </dependency>
-
 
     </dependencies>
 

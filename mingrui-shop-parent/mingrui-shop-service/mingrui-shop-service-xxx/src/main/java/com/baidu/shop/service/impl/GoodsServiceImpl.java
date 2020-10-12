@@ -3,22 +3,33 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.MrRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
-import com.baidu.shop.entity.*;
+import com.baidu.shop.feign.ElasticsearchFeign;
+import com.baidu.shop.feign.TemplateFeign;
 import com.baidu.shop.mapper.*;
+import com.baidu.shop.entity.SkuEntity;
+import com.baidu.shop.entity.SpuDetailEntity;
+import com.baidu.shop.entity.SpuEntity;
+import com.baidu.shop.entity.StockEntity;
 import com.baidu.shop.service.GoodsService;
+import com.baidu.shop.util.StringUtil;
 import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.util.BaiduBeanUtil;
 import com.baidu.shop.util.ObjectUtil;
-import com.baidu.shop.util.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +64,16 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
     @Resource
     private SpuDetailMapper spuDetailMapper;
+
+    @Autowired
+    private TemplateFeign templateFeign;
+
+    @Resource
+    private ElasticsearchFeign elasticsearchFeign;
+
+    @Resource
+    private MrRabbitMQ mrRabbitMQ;
+
 
 
     //@Override
@@ -172,6 +193,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         //新增spu
         //新增返回主键
+
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
 
         final Date date = new Date();//保持时间一致
@@ -192,6 +214,24 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         this.saveSkusAndStocks(spuDTO,date,spuEntity.getId());
 
 
+        //事务提交成功后操作
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit(){
+                //生成商品静态HTML文件
+                //templateFeign.createStaticHTMLTemplate(spuEntity.getId());
+                //新增数据到es库
+                //ela
+                // sticsearchFeign.saveEsData(spuEntity.getId());
+
+                //发送消息,生成商品静态HTML文件 和 新增数据到es库
+                mrRabbitMQ.send(spuEntity.getId() + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+
+            }
+        });
+
+
+
         return this.setResultSuccess();
     }
 
@@ -199,8 +239,6 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Transactional
     @Override
     public Result<List<JSONObject>> editGoods(SpuDTO spuDTO) {
-
-
 
         //保持时间一致
         Date date = new Date();
@@ -239,12 +277,26 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         //新增sku和stock 到数据库
         this.saveSkusAndStocks(spuDTO,date,spuDTO.getId());
 
+        //事务提交成功后操作
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit(){
+//                //修改商品静态HTML文件
+//                templateFeign.createStaticHTMLTemplate(spuEntity.getId());
+//                //修改数据到es库
+//                elasticsearchFeign.saveEsData(spuEntity.getId());
+
+                //发送消息
+                mrRabbitMQ.send(spuEntity.getId() + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+            }
+        });
 
         return this.setResultSuccess();
     }
 
     //删除商品
     @Override
+    @Transactional
     public Result<List<JSONObject>> deleteGoods(Integer spuId) {
         if(ObjectUtil.isNotNull(spuId)){
             //删除 spu
@@ -253,6 +305,17 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
             spuDetailMapper.deleteByPrimaryKey(spuId);
             //删除sku和stock
             this.deleteSkusAndStocks(spuId);
+
+            //事务提交成功后操作
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit(){
+
+                    //发送消息
+                    mrRabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_DELETE);
+
+                }
+            });
 
             return this.setResultSuccess();
         }
@@ -276,8 +339,6 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         return this.setResultSuccess(skuDTO);
     }
-
-
 
 
 

@@ -1,14 +1,11 @@
 package com.baidu.shop.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SkuDTO;
-import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.entity.SpuDetailEntity;
-import com.baidu.shop.entity.SpuEntity;
-import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
