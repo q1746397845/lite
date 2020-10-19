@@ -41,20 +41,26 @@ const shortcut = {
     name: "shortcut",
     data() {
         return {
-            user: null
+            user: null,
+            
         }
     },
     created() {
    /* 
     * 请求用户数据 
-    *    b2c.http("/auth/verify")
+    */
+     mrshop.checkUserLogin()
             .then(resp => {
-                this.user = resp.data;
-            })*/
+                console.log(resp)
+                if(resp.data.code == 200){
+                    this.user = resp.data.data;
+                }
+                
+            }).catch(error => console.log(error))
     },
     methods: {
         gotoLogin() {
-            window.location = "login.html?returnUrl=" + window.location;
+            window.location = "../login.html?returnUrl=" + window.location;
         }
     }
 }

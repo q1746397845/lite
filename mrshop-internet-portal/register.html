@@ -78,10 +78,10 @@
                 <div class="control-group">
                     <label class="control-label">短信验证码：</label>
                     <div class="controls">
-                        <input type="text" placeholder="短信验证码" class="input-xfat input-xlarge" style="width: 120px;"
-                               v-model="user.code" name="code" v-validate="'required'" data-vv-as="验证码">
-                        <span class="code-span" @click="createVerifyCode">
-                               获取短信验证码
+                        <input type="text" placeholder="短信验证码" class="input-xfat input-xlarge" 
+                            style="width: 120px;"  v-model="user.code" name="code" v-validate="{required:true,validCode:user.phone}" data-vv-as="验证码">
+                        <span class="code-span" @click="createVerifyCode" style="width: 150px;">
+                               {{sendMsg}}
                         </span>
                     </div>
                     <span style="color: red;">{{ errors.first('code') }}</span>
@@ -96,7 +96,7 @@
                 <div class="control-group">
                     <label class="control-label"></label>
                     <div class="controls btn-reg">
-                        <a class="sui-btn btn-block btn-xlarge btn-danger" href="javascript:void(0)" target="_blank"
+                        <a class="sui-btn btn-block btn-xlarge btn-danger" href="javascript:void(0)"
                            @click.stop="submit"
                         >完成注册</a>
                     </div>
@@ -154,7 +154,9 @@
             },
             check: {
                 username: false
-            }
+            },
+            sended:false,//是否发送了验证嘛
+            sendMsg:"获取短信验证码",
         },
         created() {
             this.$validator.extend('useful', {
@@ -163,12 +165,14 @@
                 },
                 validate(value, args) {
                     return new Promise(resolve => {
-                        b2c.http.get("/user/check/" + value + "/" + args[0])
+                        mrshop.http.get("/user-center/user/check/" + value + "/" + args[0])
                             .then(resp => {
-                                resolve({
-                                    valid: resp.data,
-                                    data: "已存在!"
-                                })
+                                if(resp.data.code == 200){
+                                    resolve({
+                                        valid: !(resp.data.data.length > 0),
+                                        data: "已存在!"
+                                    })
+                                }
                             })
                     });
                 }
@@ -181,12 +185,57 @@
                     return val === args[0]
                 }
             })
+            this.$validator.extend('validCode', {
+                getMessage() {
+                    return "验证码输入错误"
+                },
+                validate(val, args) {
+
+                    return new Promise(resolve => {
+                        mrshop.http.get("/user-center/user/checkValidCode",{
+                            params:{
+                                phone:args[0],
+                                code:val
+                            }
+                        }).then(resp => {
+                            resolve({
+                                valid:resp.data.code == 200
+                            })
+                        }).catch(error =>{console.log(error)});
+                    })
+                }
+            })
         },
         methods: {
             createVerifyCode() {// 生成短信验证码
+
+                if(this.sended){//如果发送了验证码就不能发送验证码了
+                    return ;
+                }
+
                 this.$validator.validate("phone").then(r => {
                     if (r) {
-                        b2c.http.post("/user/send", "phone=" + this.user.phone);
+                        mrshop.http.post("/user-center/user/sendValidCode", {
+                            phone : this.user.phone
+                        }).then(resp =>{
+                            console.log(resp)
+                            if(resp.data.code == 200){
+                                //发送验证码后,设置为已发送过验证码
+                                this.sended = true;
+                                //验证码有效时间60秒
+                                let time = 60;
+                                //js执行定时任务
+                                const timer = window.setInterval(() =>{
+                                    time--;
+                                    this.sendMsg = "验证码已发送请"+ time + "秒后重试";
+                                    if(time == 1){
+                                        window.clearInterval(timer);
+                                        this.sendMsg = "获取短信验证码";
+                                        this.sended = false;
+                                    }
+                                }, 1000);
+                            }
+                        }).catch(error =>{error});
                     }
                 });
 
@@ -195,9 +244,9 @@
                 this.$validator.validateAll().then(d => {
                     if (d) {
                         // 校验通过，提交表单
-                        b2c.http.post("/user/register", b2c.stringify(this.user))
+                        mrshop.http.post("/user-center/user/register",this.user)
                             .then(resp => {
-                                if (resp.status === 201) {
+                                if (resp.data.code === 200) {
                                     // 注册成功
                                     alert("注册成功,即将跳转到登录页！");
                                     setTimeout(() => window.location = '/login.html', 2000);

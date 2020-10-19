@@ -450,7 +450,7 @@
         
                 //获取要搜索内容
                 this.search = mrshop.getUrlParam("key");
-                mrshop.http.get("es/search",{
+                mrshop.http.get("search/es/search",{
                     params:{
                         page:this.page,
                         search:this.search,

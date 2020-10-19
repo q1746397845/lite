@@ -1,8 +1,7 @@
 const b2cTop = {
     template:  `<div class="nav-top">
-
     <!--页面顶部白条条，由js动态加载-->
-
+    <shortcut/>
     <!--头部-->
     <div class="header" id="headApp">
         <div class="py-container">

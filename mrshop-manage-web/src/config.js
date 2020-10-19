@@ -5,7 +5,7 @@ const config = {
   debug: {
     http: false // http request log
   },
-  api: `${baseUrl}/api-xxx`,
+  api: `${baseUrl}/api/manage`,
   theme:{
     primary: "#2196F3",
     secondary: "#455A64",

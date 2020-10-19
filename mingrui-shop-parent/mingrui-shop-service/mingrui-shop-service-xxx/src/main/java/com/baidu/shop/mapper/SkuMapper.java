@@ -11,6 +11,6 @@ import java.util.List;
 
 public interface SkuMapper extends Mapper<SkuEntity>, DeleteByIdListMapper<SkuEntity,Long> {
 
-    @Select("select sk.*,st.stock from tb_stock st,tb_sku sk where sk.id = st.sku_id and sk.spu_id = #{spuId}")
+    @Select("select sk.*,st.stock,sk.own_spec as ownSpec from tb_stock st,tb_sku sk where sk.id = st.sku_id and sk.spu_id = #{spuId}")
     List<SkuDTO> selectSkuAndStockBySpuId(Integer spuId);
 }

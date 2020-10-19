@@ -9,7 +9,23 @@
 
     <link rel="stylesheet" type="text/css" href="css/webbase.css"/>
     <link rel="stylesheet" type="text/css" href="css/pages-login.css"/>
+    <style type="text/css">
+        .code-span {
+            display: inline-block;
+            border: 1px solid #999;
+            text-align: center;
+            line-height: 35px;
+            width: 118px;
+            height: 35px;
+            float: right;
+            margin-left: 10px
+        }
+        .code-span:hover{
+            background-color: #c0ccda;
+        }
+    </style>
 </head>
+
 
 <body>
 <div class="login-box">
@@ -23,27 +39,51 @@
             <div class="loginform">
                 <ul class="sui-nav nav-tabs tab-wraped">
                     <li>
-                        <a href="#index" data-toggle="tab">
-                            <h3>扫描登录</h3>
+                        <a href="#index" data-toggle="tab" @click="phoneLogin()">
+                            <h3>手机号登录</h3>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="#profile" data-toggle="tab">
-                            <h3>账户登录</h3>
+                        <a href="#profile" data-toggle="tab" @click="usernameLogin()">
+                            <h3 >账户登录</h3>
                         </a>
                     </li>
                 </ul>
                 <div class="tab-content tab-wraped">
                     <div id="index" class="tab-pane">
-                        <p>二维码登录，暂为官网二维码</p>
-                        <img src="img/wx_cz.jpg"/>
+                        <form class="sui-form">
+                            <div class="input-prepend">
+                                <span class="add-on loginname"></span>
+                                <input id="phone" type="text" placeholder="手机号" data-vv-as="手机号" 
+                                    class="span2 input-xfat" v-model="form.phone" name="phone" 
+                                    v-validate="{required:(form.type == 2 ? true : false),regex:/^1[35678]\d{9}$/,useful:2}">
+                            </div>
+                            <span style="color: red;">{{ errors.first('phone') }}</span>
+                            <div class="control-group">
+                                <label class="control-label"></label>
+                                <div class="controls">
+                                    <input type="text" placeholder="短信验证码"  class="input-xfat input-xlarge" 
+                                        style="width: 120px;" name="code"  data-vv-as="验证码" v-model="form.code"
+                                        v-validate="{required:(form.type == 2 ? true : false),validCode:form.phone}">
+                                    <span class="code-span" style="width: 150px;"  @click="createVerifyCode">
+                                        {{sendMsg}}
+                                    </span>
+                                </div> 
+                                <span style="color: red;">{{ errors.first('code') }}</span>        
+                                <span style="color: red;"></span>
+                            </div>               
+                            <div class="logined">
+                                <a class="sui-btn btn-block btn-xlarge btn-danger" @click="login"
+                                   href="javascript:void(0)">登&nbsp;&nbsp;录</a>
+                            </div>
+                        </form>
                     </div>
                     <div id="profile" class="tab-pane  active">
                         <span v-text="msg"></span>
                         <form class="sui-form">
                             <div class="input-prepend"><span class="add-on loginname"></span>
-                                <input id="username" type="text" placeholder="邮箱/用户名/手机号" class="span2 input-xfat"
-                                    v-model="form.username">
+                                <input id="username" type="text" placeholder="邮箱/用户名/手机号" 
+                                class="span2 input-xfat" v-model="form.username">
                             </div>
                             <div class="input-prepend"><span class="add-on loginpwd"></span>
                                 <input id="password" type="password" placeholder="请输入密码" class="span2 input-xfat"
@@ -97,27 +137,131 @@
 <script src="./js/vue/vue.js"></script>
 <script src="./js/axios.min.js"></script>
 <script src="./js/common.js"></script>
+<script src="./js/validate.js"></script>
 <script type="text/javascript">
+Vue.use(VeeValidate, {
+        events: 'blur',
+        dictionary: {
+            zh: {
+                messages: {
+                    required: (field) => field + '不能为空！',
+                    min: (field, args) => field + '长度不能小于' + args[0],
+                    max: (field, args) => field + '长度不能大于' + args[0],
+                    alpha_dash: (field) => field + '只能包含数字、字母或下划线',
+                    regex: (field) => field + "格式不正确",
+                    is: () => "两次密码不一致"
+                }
+            }
+        },
+        locale: 'zh'
+    });
     var loginVm = new Vue({
         el: "#loginApp",
         data: {
             form:{
                 username:'',
-                password:''
+                password:'',
+                phone:'',
+                code:'',
+                type:1
             },
-            msg:''
+            msg:'',
+            sended:false,//是否发送了验证嘛
+            sendMsg:"获取短信验证码",
         },
         methods:{
+            phoneLogin(){
+                this.form.type = 2;
+            },
+            usernameLogin(){
+                this.form.type = 1;
+            },
             login(){
-                b2c.http.post("/user/login",b2c.stringify(this.form))
-                    .then(resp => {
-                        if(resp.status === 200){
-                            const url = b2c.getUrlParam("returnUrl");
-                            window.location = url || 'http://www.b2c.com';
-                        }
+                this.$validator.validateAll().then(d =>{
+                    if (d) {
+                        mrshop.http.post("/oauth/oauth/login",this.form).then(resp => {
+                            if(resp.data.code === 200){
+                                const url = mrshop.getUrlParam("returnUrl");
+                                window.location = url || 'http://www.mrshop.com';
+                            }else if(resp.data.code == 5004){
+                                this.msg = '用户名或密码错误'
+                            }
+                        }).catch(error => console.log(error))
+                    }
+                })
+            },
+            createVerifyCode() {// 生成短信验证码
+
+                if(this.sended){//如果发送了验证码就不能发送验证码了
+                    return ;
+                }
+
+                this.$validator.validate("phone").then(r => {
+                    if (r) {
+                        mrshop.http.post("/user-center/user/sendValidCode", {
+                            phone : this.form.phone
+                        }).then(resp =>{
+                            console.log(resp)
+                            if(resp.data.code == 200){
+                                //发送验证码后,设置为已发送过验证码
+                                this.sended = true;
+                                //验证码有效时间60秒
+                                let time = 60;
+                                //js执行定时任务
+                                const timer = window.setInterval(() =>{
+                                    time--;
+                                    this.sendMsg = "验证码已发送请"+ time + "秒后重试";
+                                    if(time == 1){
+                                        window.clearInterval(timer);
+                                        this.sendMsg = "获取短信验证码";
+                                        this.sended = false;
+                                    }
+                                }, 1000);
+                            }
+                        }).catch(error =>{error});
+                    }
+                });
+            },
+        },
+        created(){
+            this.$validator.extend('useful', {
+                getMessage(field, args, data) {
+                    return '手机未注册';
+                },
+                validate(value, args) {
+                   
+                    return new Promise(resolve => {
+                        mrshop.http.get("/user-center/user/check/" + value + "/" + args[0])
+                            .then(resp => {
+                                if(resp.data.code == 200){
+                                    resolve({
+                                        valid: resp.data.data.length > 0,
+                                    })
+                                }
+                            })
+                    });
+                }
+            })
+            this.$validator.extend('validCode', {
+                getMessage() {
+                    return "验证码输入错误"
+                },
+                validate(val, args) {
+
+                    return new Promise(resolve => {
+                        mrshop.http.get("/user-center/user/checkValidCode",{
+                            params:{
+                                phone:args[0],
+                                code:val
+                            }
+                        }).then(resp => {
+                            resolve({
+                                valid:resp.data.code == 200,
+                            })
+                        }).catch(error =>{console.log(error)});
                     })
-                    .catch(() => this.msg = '用户名或密码错误')
-            }
+                }
+            })
         }
     });
 </script>

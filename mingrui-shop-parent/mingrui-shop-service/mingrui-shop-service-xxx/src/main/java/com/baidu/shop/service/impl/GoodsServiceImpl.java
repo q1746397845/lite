@@ -221,8 +221,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
                 //生成商品静态HTML文件
                 //templateFeign.createStaticHTMLTemplate(spuEntity.getId());
                 //新增数据到es库
-                //ela
-                // sticsearchFeign.saveEsData(spuEntity.getId());
+                // elasticsearchFeign.saveEsData(spuEntity.getId());
 
                 //发送消息,生成商品静态HTML文件 和 新增数据到es库
                 mrRabbitMQ.send(spuEntity.getId() + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
