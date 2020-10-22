@@ -3,8 +3,8 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.constant.MRshopConstant;
 import com.baidu.shop.constant.UserConstant;
-import com.baidu.shop.constant.ValidPhoneCode;
 import com.baidu.shop.dto.UserDTO;
 import com.baidu.shop.entity.UserEntity;
 import com.baidu.shop.luosimao.LuosimaoDuanxinUtil;
@@ -79,8 +79,8 @@ public class UserServiceImpl extends BaseApiService implements UserService {
         String code = (int)((Math.random() * 9 + 1) * 100000) + "";
 
 
-        redisRepository.set(ValidPhoneCode.PHONE_PRE_ + userDTO.getPhone(),code);
-        redisRepository.expire(ValidPhoneCode.PHONE_PRE_ + userDTO.getPhone(),60);
+        redisRepository.set(MRshopConstant.PHONE_PRE_ + userDTO.getPhone(),code);
+        redisRepository.expire(MRshopConstant.PHONE_PRE_ + userDTO.getPhone(),60);
 
         //发送短信验证码
         //LuosimaoDuanxinUtil.sendSpeak(userDTO.getPhone(),code);
@@ -93,7 +93,7 @@ public class UserServiceImpl extends BaseApiService implements UserService {
     @Override
     public Result<JSONObject> checkValidCode(String phone, String code) {
 
-        String redisValidCode = redisRepository.get(ValidPhoneCode.PHONE_PRE_ + phone);
+        String redisValidCode = redisRepository.get(MRshopConstant.PHONE_PRE_ + phone);
 
         if(!code.equals(redisValidCode)){
             return this.setResultError(HTTPStatus.VALID_CODE_ERROR,"验证码输入错误");

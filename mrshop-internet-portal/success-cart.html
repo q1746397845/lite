@@ -9,6 +9,10 @@
 
     <link rel="stylesheet" type="text/css" href="css/webbase.css" />
     <link rel="stylesheet" type="text/css" href="css/pages-success-cart.css" />
+    <script src="./js/vue/vue.js"></script>
+    <script src="./js/vue/vuetify.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/common.js"></script>
 </head>
 
 <body>
@@ -39,7 +43,7 @@ $(function(){
 <script type="text/javascript" src="js/plugins/sui/sui.min.js"></script>
 <script type="text/javascript" src="js/widget/nav.js"></script>
 </body>
-    <div class="success-cart">
+    <div class="success-cart" id="cart">
         <div class="py-container ">
             <h3><i class="sui-icon icon-pc-right"></i>商品已成功加入购物车！</h3>
             <div class="goods">
@@ -51,7 +55,7 @@ $(function(){
                     </div>
                 </div>
                 <div class="right-gocart">
-                    <a href="#" class="sui-btn btn-xlarge">查看商品详情</a>
+                    <a @click="toItem()" class="sui-btn btn-xlarge">查看商品详情</a>
                     <a href="cart.html" class="sui-btn btn-xlarge btn-danger " target="_blank">去购物车结算 > </a>
                 </div>
             </div>
@@ -603,6 +607,18 @@ $(function(){
 	<script type="text/javascript">$(".footer").load("foot.html");</script>
 	<!--页面底部END-->
 <!--页面底部END-->
-
-
+    <script type="text/javascript">
+        var cartVm = new Vue({
+            el: '#cart',
+            data:{
+                mrshop,
+                spuId: mrshop.getUrlParam("spuId")
+            },
+            methods:{
+                toItem(){
+                    window.location.href = "/item/" + this.spuId + ".html";
+                }
+            }
+        })
+    </script>
 </html>

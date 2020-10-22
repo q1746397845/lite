@@ -668,8 +668,7 @@
                         skuId:this.sku.id,
                         num:this.num
                     }).then(resp =>{
-                        console.log(resp)
-                        window.location.href = '../success-cart.html';
+                        window.location.href = '../success-cart.html?spuId=' + this.spu.id;
                     }).catch(error =>{
                         console.log(error)
                     })
@@ -677,7 +676,7 @@
                     //从localstorage中获取购物车数据 || 如果没有获取到数据,直接返回空的数组
                     let carList = mrshop.store.get("carList") || [];
                     //判断当前将要加入到购物车中的数据是否在购物车中
-                    let car = carList.find(car => car.skuId == this.spu.id);
+                    let car = carList.find(car => car.skuId == this.sku.id);
                     if(car) {//存在
                         //原来的数量加上当前设置的num数量
                         if(car.num + this.num > this.sku.stock){
@@ -691,7 +690,7 @@
                         car = {
                             skuId:this.sku.id,
                             title:this.sku.title,
-                            image:this.sku.images[0],
+                            image:this.images[0],
                             price:this.sku.price,
                             num:this.num,
                             ownSpec:JSON.stringify(this.ownSpec)

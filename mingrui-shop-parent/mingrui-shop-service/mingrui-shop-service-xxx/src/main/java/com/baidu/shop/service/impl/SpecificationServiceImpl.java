@@ -151,4 +151,10 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
 
         return this.setResultSuccess();
     }
+
+    @Override
+    public Result<SpecParamEntity> getSpecParamById(Integer id) {
+        SpecParamEntity specParamEntity = specParamMapper.selectByPrimaryKey(id);
+        return this.setResultSuccess(specParamEntity);
+    }
 }

@@ -44,7 +44,7 @@ public interface SpecificationService {
 
 
     @GetMapping(value = "specParam/getSpecParamInfo")
-    @ApiOperation(value = "通过规格组id查询规格参数")
+    @ApiOperation(value = "查询规格参数")
     Result<List<SpecParamEntity>> getSpecParamInfo(@SpringQueryMap SpecParamDTO specParamDTO);
 
     @PostMapping(value = "specParam/saveSpecParam")
@@ -59,6 +59,8 @@ public interface SpecificationService {
     @ApiOperation(value = "删除规格组参数")
     Result<List<JSONObject>> deleteSpecParam(Integer id);
 
-
+    @GetMapping(value = "specParam/getSpecParamById")
+    @ApiOperation(value = "通过规格参数id查询规格参数")
+    Result<SpecParamEntity> getSpecParamById(@RequestParam Integer id);
 
 }

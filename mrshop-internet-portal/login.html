@@ -181,8 +181,24 @@ Vue.use(VeeValidate, {
                     if (d) {
                         mrshop.http.post("/oauth/oauth/login",this.form).then(resp => {
                             if(resp.data.code === 200){
-                                const url = mrshop.getUrlParam("returnUrl");
-                                window.location = url || 'http://www.mrshop.com';
+                                //购物车合并,将localStorage中的数据同步到购物车,然后清空localStorage
+                                let carList = mrshop.store.get("carList") || [];
+                                
+                                if(carList.length > 0){
+                                    //不能用get请求,get请求限制大小
+                                    mrshop.http.post("/car/car/mergeCar",{
+                                        clientCarList:carList
+                                    }).then(resp =>{
+                                        if(resp.data.code === 200){
+                                            mrshop.store.del('carList');
+                                            const url = mrshop.getUrlParam("returnUrl");
+                                            window.location = url || 'http://www.mrshop.com';
+                                        }
+                                    })
+                                }else{
+                                    const url = mrshop.getUrlParam("returnUrl");
+                                    window.location = url || 'http://www.mrshop.com';
+                                }     
                             }else if(resp.data.code == 5004){
                                 this.msg = '用户名或密码错误'
                             }

@@ -21,7 +21,7 @@ import java.security.PublicKey;
 @Configuration
 public class JwtConfig {
     @Value("${mrshop.jwt.pubKeyPath}")
-    private String pubKeyPath;// 公钥
+    private String pubKeyPath;// 公钥地址
     @Value("${mrshop.jwt.cookieName}")
     private String cookieName;// cookie名称
 

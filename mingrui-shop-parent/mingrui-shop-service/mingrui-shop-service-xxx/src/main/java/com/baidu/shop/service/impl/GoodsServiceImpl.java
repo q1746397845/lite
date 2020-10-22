@@ -401,4 +401,10 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         return this.setResultError("操作失败");
     }
+
+    @Override
+    public Result<SkuEntity> getSkuBySkuId(Long skuId) {
+        SkuEntity skuEntity = skuMapper.selectByPrimaryKey(skuId);
+        return this.setResultSuccess(skuEntity);
+    }
 }
