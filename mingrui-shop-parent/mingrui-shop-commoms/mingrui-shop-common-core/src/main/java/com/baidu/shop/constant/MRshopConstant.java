@@ -12,4 +12,6 @@ public class MRshopConstant {
     public static final String PHONE_PRE_ = "PHONE_PRE_";
 
     public static final String USER_GOODS_CAR_PRE_ = "user_goods_car_";
+
+    public static final String USER_DEL_GOODS_CAR_PRE_ = "user_del_goods_car_";
 }

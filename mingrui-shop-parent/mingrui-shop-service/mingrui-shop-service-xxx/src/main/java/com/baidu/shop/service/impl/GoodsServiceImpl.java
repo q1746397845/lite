@@ -407,4 +407,20 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         SkuEntity skuEntity = skuMapper.selectByPrimaryKey(skuId);
         return this.setResultSuccess(skuEntity);
     }
+
+    //减少商品库存
+    @Transactional
+    @Override
+    public Result<JSONObject> updateGoodsStock(Integer num,Long skuId) {
+
+        stockMapper.deleteGoodsStock(num,skuId);
+        return this.setResultSuccess();
+    }
+
+    //增加商品库存
+    @Override
+    public Result<JSONObject> addGoodsStock(Integer num, Long skuId) {
+        stockMapper.addGoodsStock(num,skuId);
+        return this.setResultSuccess();
+    }
 }

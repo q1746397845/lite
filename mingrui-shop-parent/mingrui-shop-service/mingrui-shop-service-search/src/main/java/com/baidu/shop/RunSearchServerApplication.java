@@ -14,7 +14,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @Version V1.0
  **/
 //exclude = {DataSourceAutoConfiguration.class} 不加载数据源的配置
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 @EnableEurekaClient
 @EnableFeignClients
 public class RunSearchServerApplication {

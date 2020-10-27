@@ -3,6 +3,7 @@ package com.baidu.shop.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.Car;
+import feign.RequestLine;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
  **/
 @Api(tags = "购物车接口")
 public interface CarService {
+
 
     @ApiOperation(value = "添加商品到购物车")
     @PostMapping(value = "car/addCar")
@@ -37,5 +39,15 @@ public interface CarService {
 
     @DeleteMapping(value = "car/delCarData")
     @ApiOperation(value = "删除购物车里的商品")
-    Result<JSONObject> delCarData(Long skuId,@CookieValue(value = "MRSHOP_TOKEN") String token);
+    Result<JSONObject> delCarData(String skuIds, @CookieValue(value = "MRSHOP_TOKEN") String token);
+
+    @GetMapping(value = "car/getUserDelGoodsCar")
+    @ApiOperation(value = "从redis获取删除购物车数据")
+    Result<JSONObject> getUserDelGoodsCar(@CookieValue(value = "MRSHOP_TOKEN") String token);
+
+    @ApiOperation(value = "把redis里的用户删除的购物车商品重新添加到购物车里")
+    @PostMapping(value = "car/addUserGoodsCarAndDelUserDelGoodsCar")
+    Result<JSONObject> addUserGoodsCarAndDelUserDelGoodsCar(@RequestBody Car car,@CookieValue(value = "MRSHOP_TOKEN") String token);
 }
+
+

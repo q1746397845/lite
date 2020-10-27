@@ -52,6 +52,7 @@ public class LoginFilter extends ZuulFilter{
         logger.debug("=============" + requestURI);
         //如果当前请求是登录请求,不执行拦截器
         return !jwtConfig.getExcludePath().contains(requestURI);
+        //return false;
     }
 
     @Override

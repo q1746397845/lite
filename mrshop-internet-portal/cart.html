@@ -102,19 +102,19 @@
             <div class="clearfix"></div>
             <div class="deled">
                 <span>已删除商品，您可以重新购买或加关注：</span>
-                <div class="cart-list del" v-for="(car,index) in delCar">
+                <div class="cart-list del" v-for="(goods,index) in delGoodsList">
                     <ul class="goods-list yui3-g">
                         <li class="yui3-u-1-2">
                             <div class="good-item">
-                                <div class="item-msg">{{ car.title }}</div>
+                                <div class="item-msg">{{ goods.title }}</div>
                             </div>
                         </li>
-                        <li class="yui3-u-1-6"><span class="price">{{ mrshop.formatPrice(car.price) }}</span></li>
+                        <li class="yui3-u-1-6"><span class="price">{{ mrshop.formatPrice(goods.price) }}</span></li>
                         <li class="yui3-u-1-6">
-                            <span class="number">{{ car.num }}</span>
+                            <span class="number">{{ goods.num }}</span>
                         </li>
                         <li class="yui3-u-1-8">
-                            <a href="#none">重新购买</a>
+                            <a href="#none" @click="anewBuy(goods)">重新购买</a>
                             <a href="#none">移到我的关注</a>
                         </li>
                     </ul>
@@ -271,9 +271,42 @@
             carList:[],
             selectList:[],
             checked:false,
-            delCar:[]
+            delGoodsList:[]
         },
         methods:{
+            anewBuy(goods){
+                mrshop.checkUserLogin().then(resp =>{
+                    mrshop.http.post("car/car/addUserGoodsCarAndDelUserDelGoodsCar",goods).then(resp =>{
+                        if(resp.data.code == 200){
+                            let carIndex = this.carList.findIndex(carGoods => carGoods.skuId == goods.skuId)
+                            let delGoodsIndex = this.delGoodsList.findIndex(delGoods => delGoods.skuId == goods.skuId);
+                            if(carIndex != -1){
+                                this.carList[carIndex].num += goods.num;
+                                this.delGoodsList.splice(delGoodsIndex,1);
+                            }else{
+                                this.delGoodsList.splice(delGoodsIndex,1);
+                                this.carList.push(goods);
+                            }
+
+                        }
+                    })
+                }).catch(error =>{
+
+                    let carIndex = this.carList.findIndex(carGoods => carGoods.skuId == goods.skuId)
+                    let delGoodsIndex = this.delGoodsList.findIndex(delGoods => delGoods.skuId == goods.skuId);
+                    if(carIndex != -1){
+                        this.carList[carIndex].num += goods.num;
+                        this.delGoodsList.splice(delGoodsIndex,1);
+                    }else{
+                        this.delGoodsList.splice(delGoodsIndex,1);
+                        this.carList.push(goods);
+                    }
+
+                    mrshop.store.set("carList",this.carList);
+                    mrshop.store.set("delGoodsList",this.delGoodsList);
+                    
+                })
+            },
             allSelect(){
                 this.checked = !this.checked
                 if(this.checked){
@@ -284,52 +317,93 @@
             },
             delSelectCar(){
                 mrshop.checkUserLogin().then(resp =>{
-                    this.selectList.forEach(selectGoods =>{
-                        mrshop.http.delete("car/car/delCarData",{
-                            params:{
-                                skuId:selectGoods.skuId
-                            }
-                        }).then(resp =>{
-                            if(resp.data.code == 200){
-                                this.carList = resp.data.data
-                            }
-                        })
-                    })
-                }).catch(error =>{
-                    
                     var[...selectList] = this.selectList;
-                    
-                    this.delCar = selectList;
 
-                    this.selectList = [];
+                    this.delGoodsList = selectList;
 
-                    this.delCar.forEach(goods =>{
+                    this.delGoodsList.forEach(goods =>{
                         let index = this.carList.findIndex(item => item.skuId == goods.skuId);
                         if(index != -1){
                             this.carList.splice(index,1)
                         }
+                    });
+                    //把删除的商品的skuId发送到后台
+                    mrshop.http.delete("car/car/delCarData",{
+                        params:{
+                            skuIds: this.delGoodsList.map(goods => goods.skuId).join()
+                        }
+                    }).then(resp =>{
+                        if(resp.data.code == 200){
+                            this.delGoodsList = resp.data.data;
+                        }
+                    })
+                }).catch(error =>{
+                    
+                    var[...selectList] = this.selectList;
+
+                    //选择的就是要删除的商品
+                    this.delGoodsList = selectList;
+
+                    //获取localstorage删除的购物车
+                    let delGoodsCarList = mrshop.store.get("delGoodsList") || [];
+
+                    //遍历要删除的商品
+                    this.delGoodsList.forEach(delGoods =>{
+                        
+                        //判断展示的购物车里商品是不是删除的商品,是的话移除
+                        let index = this.carList.findIndex(item => item.skuId == delGoods.skuId);
+                        if(index != -1){
+                            this.carList.splice(index,1)
+                        }
+
+                        //判断删除的购物车里包含 要删除的购物车商品
+                        //如果包含的话只修改数量
+                        //不包含的话push进去
+                        let goods = delGoodsCarList.find(delCar => delCar.skuId == delGoods.skuId);
+                        if(goods){//证明包含,修改数量即可
+                            goods.num +=  delGoods.num;
+                        }else{
+                            delGoodsCarList.push(delGoods);
+                        }  
                     })   
+                    //this.delGoodsList要展示在页面的已删除商品里,所以要把this.delGoodsList重新赋值
+                    //这块写的不好,this.delGoodsList 既要接收删除的数据,还要负责展示页面上已删除商品列表
+                    this.delGoodsList = delGoodsCarList;
+                    //重新赋值localstorage里删除的购物车数据
+                    mrshop.store.set("delGoodsList",delGoodsCarList);
+                    //重新赋值localstorage里购物车数据
                     mrshop.store.set("carList",this.carList);
-                    mrshop.store.set("delCar",this.delCar);
+                    
                 })
             },
             delCar(car){
                 mrshop.checkUserLogin().then(resp =>{
+
+                    let index = this.carList.findIndex(item => item.skuId == car.skuId);
+                    this.carList.splice(index,1);
+
                     mrshop.http.delete("car/car/delCarData",{
                         params:{
-                            skuId:car.skuId
+                            skuIds:car.skuId
                         }
                     }).then(resp =>{
                         if(resp.data.code == 200){
-                            this.carList = resp.data.data
+                            this.delGoodsList = resp.data.data
                         }
                     })
                 }).catch(error =>{
-                    for(var i = 0;i < this.carList.length;i++){
-                        if(this.carList[i].skuId == car.skuId){
-                            this.carList.splice(i,1)
-                        }
-                    }
+
+                    let index = this.carList.findIndex(item => item.skuId == car.skuId);
+                    this.carList.splice(index,1);
+                    
+                    //获取localstorage删除的购物车
+                    let goods = this.delGoodsList.find(delCar => delCar.skuId == car.skuId);
+                        if(goods){//证明包含,修改数量即可
+                            goods.num +=  car.num;
+                        }else{
+                            this.delGoodsList.push(car);
+                        }  
+                    mrshop.store.set("delGoodsList",this.delGoodsList);
                     mrshop.store.set("carList",this.carList);
                 })
             },
@@ -375,12 +449,21 @@
         },
         created(){
             mrshop.checkUserLogin().then(resp =>{
+                //查询购物车数据
                 mrshop.http.get('car/car/getUserGoodsCar').then(resp =>{
-                    this.carList = resp.data.data
+                    if(resp.data.code == 200){
+                        this.carList = resp.data.data
+                    }
+                })
+                //查询删除购物车的数据
+                mrshop.http.get('car/car/getUserDelGoodsCar').then(resp =>{
+                    if(resp.data.code == 200){
+                        this.delGoodsList = resp.data.data
+                    }
                 })
             }).catch(() =>{
                 this.carList = mrshop.store.get("carList") || [];
-                this.delCar = mrshop.store.get("delCar") || [];
+                this.delGoodsList = mrshop.store.get("delGoodsList") || [];
             })
         },
         computed:{

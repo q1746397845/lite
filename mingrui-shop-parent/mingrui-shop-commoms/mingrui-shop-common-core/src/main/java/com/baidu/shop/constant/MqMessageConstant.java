@@ -26,6 +26,20 @@ public class MqMessageConstant {
 
     public static final String ALTERNATE_EXCHANGE = "exchange.ae";
     public static final String EXCHANGE = "exchange.mr";
+
+
+
+    // 订单延期交换机 name
+    public static final String ORDER_DELAY_Exchange_Name = "delay.exchange";
+
+    //订单延期 队列name
+    public static final String ORDER_DELAY_QUEUE_NAME = "delay.queue";
+
+    //订单的routingkey
+    public static final String ORDER_ROUT_KEY_UPDATE = "order.update";
+
+
+
     //Dead Letter Exchanges
     public static final String EXCHANGE_DLX = "exchange.dlx";
     public static final String EXCHANGE_DLRK = "dlx.rk";

@@ -2,6 +2,7 @@ package com.baidu.shop.component;
 
 import com.baidu.shop.constant.MqMessageConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class MrRabbitMQ implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback{
 
     private RabbitTemplate rabbitTemplate;
+
 
     //构造方法注入
     @Autowired

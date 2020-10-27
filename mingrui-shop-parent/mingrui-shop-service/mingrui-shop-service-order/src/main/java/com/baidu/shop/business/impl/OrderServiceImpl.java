@@ -3,30 +3,31 @@ package com.baidu.shop.business.impl;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.business.OrderService;
+import com.baidu.shop.component.MrRabbitMQ;
 import com.baidu.shop.config.JwtConfig;
 import com.baidu.shop.constant.MRshopConstant;
 import com.baidu.shop.dto.Car;
 import com.baidu.shop.dto.OrderDTO;
+import com.baidu.shop.dto.OrderInfo;
 import com.baidu.shop.dto.UserInfo;
 import com.baidu.shop.entity.OrderDetailEntity;
 import com.baidu.shop.entity.OrderEntity;
 import com.baidu.shop.entity.OrderStatusEntity;
+import com.baidu.shop.feign.GoodsFeign;
 import com.baidu.shop.mapper.OrderDetailMapper;
 import com.baidu.shop.mapper.OrderMapper;
 import com.baidu.shop.mapper.OrderStatusMapper;
 import com.baidu.shop.redis.repository.RedisRepository;
 import com.baidu.shop.status.HTTPStatus;
-import com.baidu.shop.util.IdWorker;
-import com.baidu.shop.util.JwtUtils;
-import com.baidu.shop.util.ObjectUtil;
+import com.baidu.shop.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +58,12 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
     @Resource
     private JwtConfig jwtConfig;
 
+    @Resource
+    private GoodsFeign goodsFeign;
+
+    @Resource
+    private MrRabbitMQ mrRabbitMQ;
+
 
     @Transactional
     @Override
@@ -64,6 +71,11 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
         //通过雪花算法生成id
         long orderId = idWorker.nextId();
         try {
+            //key --> 订单id,value-->订单的商品数量和商品的id
+            Map<String, String> orderIdAndOrderDetailMap = new HashMap<>();
+            //key --> 订单商品的Id,value --> 订单商品的数量
+            Map<String, String> orderDetail = new HashMap<>();
+
             UserInfo userInfo = JwtUtils.getInfoFromToken(token, jwtConfig.getPublicKey());
             Date date = new Date();
 
@@ -100,6 +112,14 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
 
                 longs.set(0,car.getPrice() * car.getNum() + longs.get(0));
 
+
+                //更新库存-->用户已经下单了,这个时候减库存
+                goodsFeign.updateGoodsStock(car.getNum(),car.getSkuId());
+
+
+                orderDetail.put(car.getSkuId()+"",car.getNum()+"");
+
+
                 return orderDetailEntity;
             }).collect(Collectors.toList());
 
@@ -122,11 +142,45 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
                 redisRepository.delHash(MRshopConstant.USER_GOODS_CAR_PRE_ + userInfo.getId() ,skuId);
             });
             //此时要保证redis和myqsl双写一致性
-            //更新库存-->用户已经下单了,这个时候减库存
+
+
+            //发送一条消息,如果用户半个小时没付款,将订单取消,库存恢复
+            orderIdAndOrderDetailMap.put(orderId + "", JSONUtil.toJsonString(orderDetail));
+            mrRabbitMQ.send(orderIdAndOrderDetailMap,60);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return this.setResult(HTTPStatus.OK,"",orderId + "");
+    }
+
+    @Override
+    public Result<OrderInfo> getOrderInfoByOrderId(Long orderId) {
+        OrderEntity orderEntity = orderMapper.selectByPrimaryKey(orderId);
+        OrderInfo orderInfo = BaiduBeanUtil.copyProperties(orderEntity, OrderInfo.class);
+
+        Example example = new Example(OrderDetailEntity.class);
+        example.createCriteria().andEqualTo("orderId",orderId);
+        List<OrderDetailEntity> OrderDetailList = orderDetailMapper.selectByExample(example);
+
+        orderInfo.setOrderDetailList(OrderDetailList);
+
+        OrderStatusEntity orderStatusEntity = orderStatusMapper.selectByPrimaryKey(orderId);
+
+        orderInfo.setOrderStatusEntity(orderStatusEntity);
+
+        return this.setResultSuccess(orderInfo);
+    }
+
+    //修改订单状态,修改为已支付
+    @Override
+    public Result<OrderInfo> updateOrderStatus(String orderId) {
+        OrderStatusEntity orderStatusEntity = new OrderStatusEntity();
+        orderStatusEntity.setOrderId(Long.valueOf(orderId));
+        orderStatusEntity.setStatus(2);
+        orderStatusMapper.updateByPrimaryKeySelective(orderStatusEntity);
+
+        return this.setResultSuccess();
     }
 }

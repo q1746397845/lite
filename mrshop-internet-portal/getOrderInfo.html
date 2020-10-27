@@ -244,6 +244,7 @@
 								//下单成功,将localStorage的selectList删除
 								mrshop.store.del("selectList");
 								//请求支付
+								window.location.href = "http://api.mrshop.com/api/pay/pay/requestPay?orderId=" + resp.data.data;
 							}
 						})
 					}).catch(error =>{

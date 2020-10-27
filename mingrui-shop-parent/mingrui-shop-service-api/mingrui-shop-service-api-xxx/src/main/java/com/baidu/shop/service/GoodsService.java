@@ -50,4 +50,12 @@ public interface GoodsService {
     @GetMapping(value = "goods/getSkuBySkuId")
     @ApiOperation("通过skuId获取sku")
     public Result<SkuEntity> getSkuBySkuId(@RequestParam Long skuId);
+
+    @PutMapping(value = "goods/updateGoodsStock")
+    @ApiOperation("减少商品库存")
+    Result<JSONObject> updateGoodsStock(@RequestParam Integer num,@RequestParam Long skuId);
+
+    @PutMapping(value = "goods/addGoodsStock")
+    @ApiOperation("恢复商品库存")
+    Result<JSONObject> addGoodsStock(@RequestParam Integer num,@RequestParam Long skuId);
 }

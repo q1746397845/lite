@@ -25,4 +25,6 @@ public class OrderStatusEntity {
     private Date createTime;
 
     private Date paymentTime;
+
+    private Date closeTime;
 }

@@ -2,17 +2,33 @@ server:
   port: 8800
 
 spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    # 是否确认回调
+    publisher-confirm-type: correlated
+    # 是否返回回调
+    publisher-returns: true
+    virtual-host: /
+    # 手动确认
+    listener:
+      simple:
+        acknowledge-mode: manual
+    template:
+      mandatory: true
   application:
     name: order-server
   redis:
     # 数据库标识，可以配置多个redis使用不同的标识区分
     database: 0
     # redisIP地址
-    host: 119.45.207.193
+    host: 127.0.0.1
     # redis端口号
     port: 6379
     # redis密码
-    password: 123456
+    #password: 123456
     # redis连接池的配置
     jedis:
       pool:
