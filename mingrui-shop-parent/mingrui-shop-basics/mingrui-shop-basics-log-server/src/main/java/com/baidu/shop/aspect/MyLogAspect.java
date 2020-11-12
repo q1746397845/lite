@@ -7,6 +7,7 @@ import com.baidu.shop.dto.UserInfo;
 import com.baidu.shop.entity.LogEntity;
 import com.baidu.shop.mapper.LogMapper;
 import com.baidu.shop.util.CookieUtils;
+import com.baidu.shop.util.JSONUtil;
 import com.baidu.shop.util.JwtUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @ClassName MyLogAspect
@@ -53,7 +55,7 @@ public class MyLogAspect {
      */
     @Transactional
     @AfterReturning(returning = "result",value = "logPointCut()")
-    public void saveRecordLog(JoinPoint joinPoint,Object result){
+    public void saveRecordLog(JoinPoint joinPoint, Object result){
         //获取RequestAttributes
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         //从RequestAttributes获取到HttpServletRequest的信息
@@ -61,13 +63,26 @@ public class MyLogAspect {
         //从切面织入点通过反射获取织入点的方法
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
+        //获取参数值
+        Object[] args = joinPoint.getArgs();
+
+        //获取参数名
+        String[] parameterNames = signature.getParameterNames();
+
+        HashMap<Object, Object> map = new HashMap<>();
+        for (int i = 0;i < parameterNames.length;i++){
+            if(!parameterNames[i].equals("token"))
+            map.put(parameterNames[i],args[i]);
+        }
+
         //获取到切入点所在的方法
         Method method = signature.getMethod();
 
         LogEntity logEntity = new LogEntity();
+        logEntity.setParams(JSONUtil.toJsonString(map));//方法传的值
 
         logEntity.setOperationTime(new Date());//操作时间
-        //获取操作
+        //获取注解参数
         MyLog annotation = method.getAnnotation(MyLog.class);
         if(null != annotation){
             logEntity.setModel(annotation.operationModel());//操作模块
@@ -76,7 +91,7 @@ public class MyLogAspect {
         }
         logEntity.setIp(GetIp.getIpAddress(request));//用户登陆的ip
 
-        logEntity.setResult(result.toString());//方法的返回值
+        //logEntity.setResult(JSONUtil.toJsonString(result));//方法的返回值
         logEntity.setOperation_method(request.getRequestURI());//访问的方法
         String cookieValue = CookieUtils.getCookieValue(request, jwtConfig.getCookieName());
         if (null != cookieValue){

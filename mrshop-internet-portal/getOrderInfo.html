@@ -116,8 +116,8 @@
 					</div>
 					<div class="step-cont">
 						<ul class="payType">
-							<li class="" >微信付款<span title="点击取消选择"></span></li>
-							<li class="selected">货到付款<span title="点击取消选择"></span></li>
+							<li class="selected" @click="alipay">支付宝扫码支付<span title="点击取消选择"></span></li>
+							<li  @click="unionpay">银联支付<span title="点击取消选择"></span></li>
 						</ul>
 					</div>
 					<div class="hr"></div>
@@ -229,24 +229,51 @@
 				],
 				selectedAddress: 0,
 				mrshop,
-				selectList:[]
+				selectList:[],
+				payType: 1//0是没选中,1是支付宝,2是银联
 			},
 			methods:{
+				unionpay(){
+					if(this.payType == 2){
+						this.payType = 0;
+					}else{
+						this.payType = 2
+					}
+				
+					console.log(this.payType);
+				},
+				alipay(){
+					if(this.payType == 1){
+						this.payType = 0;
+					}else{
+						this.payType = 1;
+					}
+					
+					console.log(this.payType);
+				},
 				createOrder(){
 					mrshop.checkUserLogin().then(resp =>{
-						mrshop.http.post("order/order/createOrder",{
-							addrId:1,//应该是获取选中地址的id
-							payType:1,//支付类型
-							skuIds:this.selectList.map(goods => goods.skuId).join()
-						}).then(resp =>{							
-							if(resp.data.code == 200){
-								console.log(resp)
-								//下单成功,将localStorage的selectList删除
-								mrshop.store.del("selectList");
-								//请求支付
-								window.location.href = "http://api.mrshop.com/api/pay/pay/requestPay?orderId=" + resp.data.data;
-							}
-						})
+						if(this.payType == 0){
+							alert("请选择支付类型");
+						}else{
+							mrshop.http.post("order/order/createOrder",{
+								addrId:1,//应该是获取选中地址的id
+								payType:this.payType,//支付类型
+								skuIds:this.selectList.map(goods => goods.skuId).join()
+							}).then(resp =>{							
+								if(resp.data.code == 200){
+									//下单成功,将localStorage的selectList删除
+									mrshop.store.del("selectList");
+									//请求支付,不同的支付类型,调用不同的支付接口
+									if(this.payType == 1){
+										window.location.href = "http://api.mrshop.com/api/pay/pay/requestPay?orderId=" + resp.data.data;
+									}else if(this.payType == 2){
+										window.location.href = "http://api.mrshop.com/api/pay/pay/UnionpayPay?orderId=" + resp.data.data;
+									}
+							
+								}
+							})
+						}	
 					}).catch(error =>{
 						window.location = "../login.html?returnUrl=" + window.location;
 					})

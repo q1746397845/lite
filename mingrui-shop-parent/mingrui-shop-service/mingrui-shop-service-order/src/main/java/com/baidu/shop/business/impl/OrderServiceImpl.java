@@ -152,7 +152,7 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
             e.printStackTrace();
         }
 
-        return this.setResult(HTTPStatus.OK,"",orderId + "");
+        return this.setResult(HTTPStatus.OK,"支付成功",orderId + "");
     }
 
     @Override

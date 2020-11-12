@@ -35,7 +35,7 @@
 
 
 	<!--列表-->
-	<div class="sort">
+	<div class="sort" 	>
 		<div class="py-container">
 			<div class="yui3-g SortList ">
 				<div class="yui3-u Left all-sort-list">
@@ -553,8 +553,9 @@
 		</div>
 	</div>
 	<!--推荐-->
+<div id="recommendApp">
 	<div class="show">
-		<div class="py-container">
+		<div class="py-container" >
 			<ul class="yui3-g Recommend">
 				<li class="yui3-u-1-6  clock">
 					<div class="time">
@@ -562,17 +563,8 @@
 						<h3>今日推荐</h3>
 					</div>
 				</li>
-				<li class="yui3-u-5-24">
-					<a href="list.html" target="_blank"><img src="img/today01.png" /></a>
-				</li>
-				<li class="yui3-u-5-24">
-					<img src="img/today02.png" />
-				</li>
-				<li class="yui3-u-5-24">
-					<img src="img/today03.png" />
-				</li>
-				<li class="yui3-u-5-24">
-					<img src="img/today04.png" />
+				<li class="yui3-u-5-24" v-if="index > 5" v-for="(recomm,index) in recommend" :key="index">
+					<a :href="'item/'+ recomm.spuId +'.html'"><img :src="recomm.images" width="180px"/></a>
 				</li>
 			</ul>
 		</div>
@@ -583,17 +575,17 @@
 			<div class="title">
 				<h3 class="fl">猜你喜欢</h3>
 				<b class="border"></b>
-				<a href="javascript:;" class="fr tip changeBnt" id="xxlChg"><i></i>换一换</a>
+				<a @click ="getRecomm" class="fr tip changeBnt" id="xxlChg"><i></i>换一换</a>
 			</div>
 			<div class="bd">
 				<ul class="clearfix yui3-g Favourate picLB" id="picLBxxl">
-					<li class="yui3-u-1-6">
+					<li class="yui3-u-1-6" v-if="index < 6" v-for="(recomm,index) in getRecommend" :key="index">
 						<dl class="picDl huozhe">
 							<dd>
-								<a href="" class="pic"><img src="img/like_02.png" alt="" /></a>
+								<a :href="'item/'+ recomm.spuId +'.html'" class="pic"><img :src="recomm.images" alt="" /></a>
 								<div class="like-text">
-									<p>阳光美包新款单肩包女包时尚子母包四件套女</p>
-									<h3>¥116.00</h3>
+									<p>{{ recomm.title }}</p>
+									<h3>{{ mrshop.formatPrice(recomm.price) }}</h3>
 								</div>
 							</dd>
 							<dd>
@@ -601,101 +593,6 @@
 								<div class="like-text">
 									<p>爱仕达 30CM炒锅不粘锅NWG8330E电磁炉炒</p>
 									<h3>¥116.00</h3>
-								</div>
-							</dd>
-						</dl>
-					</li>
-					<li class="yui3-u-1-6">
-						<dl class="picDl jilu">
-							<dd>
-								<a href="" class="pic"><img src="img/like_03.png" alt="" /></a>
-								<div class="like-text">
-									<p>爱仕达 30CM炒锅不粘锅NWG8330E电磁炉炒</p>
-									<h3>¥116.00</h3>
-								</div>
-							</dd>
-							<dd>
-								<a href="" class="pic"><img src="img/like_02.png" alt="" /></a>
-								<div class="like-text">
-									<p>阳光美包新款单肩包女包时尚子母包四件套女</p>
-									<h3>¥116.00</h3>
-								</div>
-							</dd>
-						</dl>
-					</li>
-					<li class="yui3-u-1-6">
-						<dl class="picDl tuhua">
-							<dd>
-								<a href="" class="pic"><img src="img/like_01.png" alt="" /></a>
-								<div class="like-text">
-									<p>捷波朗 </p>
-									<p>（jabra）BOOSI劲步</p>
-									<h3>¥236.00</h3>
-								</div>
-							</dd>
-							<dd>
-								<a href="" class="pic"><img nsrc="assets/img/like_02.png" alt="" /></a>
-								<div class="like-text">
-									<p>三星（G5500）</p>
-									<p>移动联通双网通</p>
-									<h3>¥566.00</h3>
-								</div>
-							</dd>
-						</dl>
-					</li>
-					<li class="yui3-u-1-6">
-						<dl class="picDl huozhe">
-							<dd>
-								<a href="" class="pic"><img src="img/like_02.png" alt="" /></a>
-								<div class="like-text">
-									<p>阳光美包新款单肩包女包时尚子母包四件套女</p>
-									<h3>¥116.00</h3>
-								</div>
-							</dd>
-							<dd>
-								<a href="" class="pic"><img src="img/like_01.png" alt="" /></a>
-								<div class="like-text">
-									<p>爱仕达 30CM炒锅不粘锅NWG8330E电磁炉炒</p>
-									<h3>¥116.00</h3>
-								</div>
-							</dd>
-						</dl>
-					</li>
-					<li class="yui3-u-1-6">
-						<dl class="picDl jilu">
-							<dd>
-								<a href="http://sc.chinaz.com/" class="pic"><img src="img/like_03.png" alt="" /></a>
-								<div class="like-text">
-									<p>捷波朗 </p>
-									<p>（jabra）BOOSI劲步</p>
-									<h3>¥236.00</h3>
-								</div>
-							</dd>
-							<dd>
-								<a href="http://sc.chinaz.com/" class="pic"><img src="img/like_02.png" alt="" /></a>
-								<div class="like-text">
-									<p>欧普</p>
-									<p>JYLZ08面板灯平板灯铝</p>
-									<h3>¥456.00</h3>
-								</div>
-							</dd>
-						</dl>
-					</li>
-					<li class="yui3-u-1-6">
-						<dl class="picDl tuhua">
-							<dd>
-								<a href="http://sc.chinaz.com/" class="pic"><img src="img/like_01.png" alt="" /></a>
-								<div class="like-text">
-									<p>三星（G5500）</p>
-									<p>移动联通双网通</p>
-									<h3>¥566.00</h3>
-								</div>
-							</dd>
-							<dd>
-								<a href="http://sc.chinaz.com/" class="pic"><img nsrc="assets/img/like_02.png" alt="" /></a>
-								<div class="like-text">
-									<p>韩国所望紧致湿润精华露400ml</p>
-									<h3>¥896.00</h3>
 								</div>
 							</dd>
 						</dl>
@@ -704,6 +601,7 @@
 			</div>
 		</div>
 	</div>
+</div>
 	<!--有趣-->
 	<div class="fun">
 		<div class="py-container">
@@ -1077,7 +975,51 @@ $(function(){
 <script type="text/javascript" src="js/widget/cartPanelView.js"></script>
 <script type="text/javascript" src="js/widget/jquery.autocomplete.js"></script>
 <script type="text/javascript" src="js/widget/nav.js"></script>
-</body>
 
+
+
+</body>
+<script src="./js/vue/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<script src="./js/common.js"></script>
+
+<script >
+ var vm = new Vue({
+		el: "#recommendApp",
+		data: {
+			recommend:{},
+			mrshop,
+			getRecommend:{}
+		},
+		methods:{
+			getRecomm(){
+				mrshop.checkUserLogin().then(resp =>{
+					mrshop.http.get("recommend/recommend/getBrowsing").then(resp =>{
+						this.getRecommend = resp.data.data
+					})
+				}).catch(() =>{
+					mrshop.http.get("recommend/recommend/getGoodsInfo").then(resp =>{
+						this.getRecommend = resp.data.data
+					})
+				})
+			}
+		},
+		created(){
+			mrshop.checkUserLogin().then(resp =>{
+				mrshop.http.get("recommend/recommend/getBrowsing").then(resp =>{
+					this.recommend = resp.data.data
+					this.getRecommend = resp.data.data
+					console.log(this.getRecommend)
+				}).catch(error => console.log(error))
+			}).catch(() =>{
+				mrshop.http.get("recommend/recommend/getGoodsInfo").then(resp =>{
+					this.recommend = resp.data.data
+					this.getRecommend = resp.data.data
+				})
+			})
+			
+		}
+	})
+</script>
 
 </html>

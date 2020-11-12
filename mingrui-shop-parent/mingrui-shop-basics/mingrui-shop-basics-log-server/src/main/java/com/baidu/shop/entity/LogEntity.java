@@ -36,4 +36,6 @@ public class LogEntity {
     private String result;//返回的数据
 
     private String type;//操作的类型
+
+    private String params;//传的值
 }

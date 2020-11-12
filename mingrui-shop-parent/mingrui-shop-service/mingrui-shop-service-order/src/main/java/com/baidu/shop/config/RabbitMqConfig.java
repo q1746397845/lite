@@ -35,14 +35,14 @@
 //    }
 //
 //
-////    @Bean
-////    FanoutExchange delayExchange(){
-////        Map<String, Object> args = new HashMap<String, Object>();
-////        args.put("x-delayed-type", "direct");
-////        FanoutExchange topicExchange = new FanoutExchange(MqMessageConstant.ORDER_DELAY_Exchange_Name, true, false, args);
-////        topicExchange.setDelayed(true);
-////        return topicExchange;
-////    }
+//    @Bean
+//    FanoutExchange delayExchange(){
+//        Map<String, Object> args = new HashMap<String, Object>();
+//        args.put("x-delayed-type", "direct");
+//        FanoutExchange topicExchange = new FanoutExchange(MqMessageConstant.ORDER_DELAY_Exchange_Name, true, false, args);
+//        topicExchange.setDelayed(true);
+//        return topicExchange;
+//    }
 //
 //    //自定义交换机
 //    @Bean

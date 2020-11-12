@@ -171,6 +171,7 @@ public class CarServiceImpl extends BaseApiService implements CarService {
         return this.setResultSuccess();
     }
 
+    @MyLog(operation = "删除购物车里的商品",operationModel = "购物车模块",operationType = "delete")
     @Override
     public Result<JSONObject> delCarData(String skuIds, String token) {
         try {

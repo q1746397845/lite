@@ -7,7 +7,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 public interface StockMapper extends Mapper<StockEntity>, DeleteByIdListMapper<StockEntity,Long> {
 
-    @Update("update tb_stock stock set stock = stock - #{num} where sku_id = #{skuId}")
+    @Update("update tb_stock stock set stock = stock - #{num} where sku_id = #{skuId} and stock > #{num}")
     void deleteGoodsStock(Integer num,Long skuId);
 
     @Update("update tb_stock stock set stock = stock + #{num} where sku_id = #{skuId}")

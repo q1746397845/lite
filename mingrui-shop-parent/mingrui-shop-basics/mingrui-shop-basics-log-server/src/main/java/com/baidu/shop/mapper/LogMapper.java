@@ -2,6 +2,7 @@ package com.baidu.shop.mapper;
 
 import com.baidu.shop.entity.LogEntity;
 import tk.mybatis.mapper.common.Mapper;
+
 /**
  * @ClassName Log
  * @Description: TODO
@@ -9,5 +10,6 @@ import tk.mybatis.mapper.common.Mapper;
  * @Date 2020/10/27
  * @Version V1.0
  **/
+@org.apache.ibatis.annotations.Mapper
 public interface LogMapper extends Mapper<LogEntity> {
 }

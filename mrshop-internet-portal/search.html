@@ -204,7 +204,7 @@
                     <li class="yui3-u-1-5" v-for="(goods,index) in goodsList" :key="index">
                         <div class="list-wrap">
                             <div class="p-img">
-                                <a :href="'item/'+ goods.id +'.html'" target="_blank">
+                                <a :href="'item/'+ goods.id +'.html'" @click="sendBrowsing(goods)" target="_blank">
                                     <img :src="goods.selected.images" height="200"/>
                                 </a>
                                 <ul class="skus">
@@ -379,7 +379,13 @@
             specAggInfo:{},
             showMore:false,
             filters:{},
-            filter:{}
+            filter:{},
+            browerHistroy:{
+                spuId:'',
+                images:'',
+                title:'',
+                price:''
+            }
         },
         watch:{
             //监控page的值,发生变化查询
@@ -392,6 +398,19 @@
         	b2cTop: () => import("./js/pages/top.js")
         },
         methods:{
+            sendBrowsing(goods){
+                console.log(goods)
+                this.browerHistroy.spuId = goods.id;
+                this.browerHistroy.images = goods.skus[0].images
+                this.browerHistroy.price = goods.skus[0].price
+                this.browerHistroy.title = goods.skus[0].title
+                console.log(this.browerHistroy)
+                mrshop.checkUserLogin().then(resp =>{
+                    mrshop.http.post("recommend/recommend/saveBrowsing",this.browerHistroy).then(resp =>{
+                        console.log(resp)
+                    }).catch(error => console.log(error))
+                }).then(error => console.log(error))
+            },
             deleteFilter(key){
                 delete this.filter[key];
                 this.searchEsData();

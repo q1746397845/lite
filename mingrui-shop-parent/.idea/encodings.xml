@@ -12,6 +12,7 @@
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-car/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-order/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-pay/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-recommend/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-search/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-template/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service-api/mingrui-shop-service-api-user/src/main/java" charset="UTF-8" />
@@ -20,7 +21,9 @@
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-car/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-order/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-pay/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-recommend/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-search/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-seckill/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-template/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-user/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mingrui-shop-service/mingrui-shop-service-xxx/src/main/java" charset="UTF-8" />

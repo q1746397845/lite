@@ -6,6 +6,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * @ClassName GlobalCorsConfig
  * @Description: TODO
@@ -33,5 +36,7 @@ public class GlobalCorsConfig {
         source.registerCorsConfiguration("/**", config);
         //3.返回新的CorsFilter.
         return new CorsFilter(source);
+
+
     }
 }

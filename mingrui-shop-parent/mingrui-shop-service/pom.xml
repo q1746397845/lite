@@ -21,6 +21,8 @@
         <module>mingrui-shop-service-car</module>
         <module>mingrui-shop-service-order</module>
         <module>mingrui-shop-service-pay</module>
+        <module>mingrui-shop-service-recommend</module>
+        <module>mingrui-shop-service-seckill</module>
     </modules>
 
     <dependencies>

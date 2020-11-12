@@ -6,7 +6,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import tk.mybatis.spring.annotation.MapperScan;
 
 /**
- * @ClassName RunLogServerApplication
+ * @ClassName RunRecommendApplication
  * @Description: TODO
  * @Author lite
  * @Date 2020/10/27
@@ -15,9 +15,8 @@ import tk.mybatis.spring.annotation.MapperScan;
 @SpringBootApplication
 @EnableEurekaClient
 @MapperScan(value = "com.baidu.shop.mapper")
-public class RunLogServerApplication {
+public class RunRecommendApplication {
     public static void main(String[] args) {
-        SpringApplication.run(RunLogServerApplication.class);
+        SpringApplication.run(RunRecommendApplication.class);
     }
 }
-

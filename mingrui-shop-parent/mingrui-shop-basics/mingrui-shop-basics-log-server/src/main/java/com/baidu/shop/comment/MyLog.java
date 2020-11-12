@@ -1,6 +1,5 @@
 package com.baidu.shop.comment;
 
-import javax.servlet.http.Cookie;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -17,17 +17,20 @@
         <module name="mingrui-shop-basic-zuul-serer" />
         <module name="mingrui-shop-service-order" />
         <module name="mingrui-shop-service-api-car" />
+        <module name="mingrui-shop-service-seckill" />
         <module name="mingrui-shop-service-api-user" />
         <module name="mingrui-shop-service-api-xxx" />
+        <module name="mingrui-shop-service-api-pay" />
         <module name="mingrui-shop-service-api-template" />
         <module name="mingrui-shop-service-car" />
         <module name="mingrui-shop-service-user" />
+        <module name="mingrui-shop-service-recommend" />
         <module name="mingrui-shop-service-xxx" />
         <module name="mingrui-shop-service-pay" />
         <module name="mingrui-shop-basic-upload-server" />
         <module name="mingrui-shop-service-template" />
         <module name="mingrui-shop-basics-log-server" />
-        <module name="mingrui-shop-service-api-pay" />
+        <module name="mingrui-shop-service-api-recommend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
@@ -50,6 +53,7 @@
       <module name="mingrui-shop-service-api-car" options="-parameters" />
       <module name="mingrui-shop-service-api-order" options="-parameters" />
       <module name="mingrui-shop-service-api-pay" options="-parameters" />
+      <module name="mingrui-shop-service-api-recommend" options="-parameters" />
       <module name="mingrui-shop-service-api-search" options="-parameters" />
       <module name="mingrui-shop-service-api-template" options="-parameters" />
       <module name="mingrui-shop-service-api-user" options="-parameters" />
@@ -57,7 +61,9 @@
       <module name="mingrui-shop-service-car" options="-parameters" />
       <module name="mingrui-shop-service-order" options="-parameters" />
       <module name="mingrui-shop-service-pay" options="-parameters" />
+      <module name="mingrui-shop-service-recommend" options="-parameters" />
       <module name="mingrui-shop-service-search" options="-parameters" />
+      <module name="mingrui-shop-service-seckill" options="-parameters" />
       <module name="mingrui-shop-service-template" options="-parameters" />
       <module name="mingrui-shop-service-user" options="-parameters" />
       <module name="mingrui-shop-service-xxx" options="-parameters" />

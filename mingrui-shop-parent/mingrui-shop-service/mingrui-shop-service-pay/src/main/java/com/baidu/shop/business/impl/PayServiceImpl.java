@@ -10,21 +10,23 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.business.PayService;
 import com.baidu.shop.config.AlipayConfig;
 import com.baidu.shop.config.JwtConfig;
+import com.baidu.shop.config.UnionPayConfig;
 import com.baidu.shop.dto.OrderInfo;
 import com.baidu.shop.dto.PayInfDTO;
 import com.baidu.shop.feign.OrderFeign;
+import com.baidu.shop.unionpay.sdk.*;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -263,4 +265,131 @@ public class PayServiceImpl extends BaseApiService implements PayService {
         }
 
     }
+
+    @Override
+    public void UnionpayPay(PayInfDTO payInfDTO, String token, HttpServletResponse resp) {
+
+
+        Map<String, String> map = UnionPayConfig.unionPayParams();
+
+        //获取订单信息
+        Result<OrderInfo> orderInfoResult = orderFeign.getOrderInfoByOrderId(payInfDTO.getOrderId());
+
+        if(orderInfoResult.getCode() == 200){
+
+            OrderInfo orderInfo = orderInfoResult.getData();
+            map.put("orderId",orderInfo.getOrderId() + "");//订单号
+            map.put("txnAmt",orderInfo.getActualPay() + "");//金额
+
+            List<String> titlList = orderInfo.getOrderDetailList().stream().map(orderDetail ->  orderDetail.getTitle()).collect(Collectors.toList());
+            String titleStr = String.join(",",titlList);
+            titleStr = titleStr.length() > 50 ? titleStr.substring(0,50)+"......." : titleStr;
+
+            map.put("riskRateInfo", "{commodityName="+ titleStr +"}");  //商品名称
+
+        }
+
+        resp.setContentType("text/html; charset="+ DemoBase.encoding);
+        /**请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面**/
+        Map<String, String> sign = AcpService.sign(map, DemoBase.encoding);
+
+        String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl();//获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
+
+        String html = AcpService.createAutoFormHtml(requestFrontUrl, sign, DemoBase.encoding);//生成自动跳转的Html表单
+        LogUtil.writeLog("打印请求HTML，此为请求报文，为联调排查问题的依据："+html);
+        //将生成的html写到浏览器中完成自动跳转打开银联支付页面；这里调用signData之后，将html写到浏览器跳转到银联页面之前均不能对html中的表单项的名称和值进行修改，如果修改会导致验签不通过
+        try {
+            resp.getWriter().write(html);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void UnionPayNotify(HttpServletRequest req,HttpServletResponse resp) throws IOException {
+
+        LogUtil.writeLog("BackRcvResponse接收后台通知开始");
+
+        String encoding = req.getParameter(SDKConstants.param_encoding);
+        // 获取银联通知服务器发送的后台通知参数
+        Map<String, String> reqParam = UnionPayConfig.getAllRequestParam(req);
+        LogUtil.printRequestLog(reqParam);
+
+        //重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
+        if (!AcpService.validate(reqParam, encoding)) {
+            LogUtil.writeLog("验证签名结果[失败].");
+            //验签失败，需解决验签问题
+
+        } else {
+            LogUtil.writeLog("验证签名结果[成功].");
+            //【注：为了安全验签成功才应该写商户的成功处理逻辑】交易成功，更新商户订单状态
+
+            String orderId =reqParam.get("orderId"); //获取后台通知的数据，其他字段也可用类似方式获取
+            String respCode = reqParam.get("respCode");
+            //判断respCode=00、A6后，对涉及资金类的交易，请再发起查询接口查询，确定交易成功后更新数据库。
+
+        }
+        LogUtil.writeLog("BackRcvResponse接收后台通知结束");
+        //返回给银联服务器http 200  状态码
+        resp.getWriter().print("ok");
+    }
+
+    @Override
+    public void UnionPayReturnUrl(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        LogUtil.writeLog("FrontRcvResponse前台接收报文返回开始");
+
+        String encoding = req.getParameter(SDKConstants.param_encoding);
+        LogUtil.writeLog("返回报文中encoding=[" + encoding + "]");
+        String pageResult = "";
+        if (DemoBase.encoding.equalsIgnoreCase(encoding)) {
+            pageResult = "/utf8_result.jsp";
+        } else {
+            pageResult = "/gbk_result.jsp";
+        }
+        Map<String, String> respParam = UnionPayConfig.getAllRequestParam(req);
+
+        // 打印请求报文
+        LogUtil.printRequestLog(respParam);
+
+        Map<String, String> valideData = null;
+        StringBuffer page = new StringBuffer();
+        if (null != respParam && !respParam.isEmpty()) {
+            Iterator<Map.Entry<String, String>> it = respParam.entrySet()
+                    .iterator();
+            valideData = new HashMap<String, String>(respParam.size());
+            while (it.hasNext()) {
+                Map.Entry<String, String> e = it.next();
+                String key = (String) e.getKey();
+                String value = (String) e.getValue();
+                value = new String(value.getBytes(encoding), encoding);
+                page.append("<tr><td width=\"30%\" align=\"right\">" + key
+                        + "(" + key + ")</td><td>" + value + "</td></tr>");
+                valideData.put(key, value);
+            }
+        }
+        if (!AcpService.validate(valideData, encoding)) {
+            page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
+            LogUtil.writeLog("验证签名结果[失败].");
+        } else {
+            page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
+            LogUtil.writeLog("验证签名结果[成功].");
+            System.out.println(valideData.get("orderId")); //其他字段也可用类似方式获取
+
+            String respCode = valideData.get("respCode");
+            //判断respCode=00、A6后，对涉及资金类的交易，请再发起查询接口查询，确定交易成功后更新数据库。
+            //修改订单状态,修改为已支付
+
+            orderFeign.updateOrderStatus(respParam.get("orderId"));
+
+            resp.sendRedirect("http://www.mrshop.com/success.html?orderId=" + respParam.get("orderId") + "&totalPay=" + Double.valueOf(respParam.get("txnAmt"))/100);
+        }
+
+        req.setAttribute("result", page.toString());
+        req.getRequestDispatcher(pageResult).forward(req, resp);
+
+        LogUtil.writeLog("FrontRcvResponse前台接收报文返回结束");
+    }
+
+
+
 }
