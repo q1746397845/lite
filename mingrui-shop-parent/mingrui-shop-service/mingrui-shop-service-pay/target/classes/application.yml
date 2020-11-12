@@ -1,0 +1,110 @@
+server:
+  port: 8900
+
+spring:
+  application:
+    name: pay-server
+  # 配置数据源
+  datasource:
+    # 数据源名称，任意
+    name: mysql
+    url: jdbc:mysql://localhost:3306/mr-shop?useSSL=true&nullNamePatternMatchesAll=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
+    # 数据库连接用户
+    username: root
+    # 数据库连接密码
+    password: root
+    # 驱动名称
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # boot2.0+使用hikari作为默认数据库连接池
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 是否自动提交事务 默认
+      auto-commit: true
+      # 允许的最小连接数
+      minimum-idle: 5
+      # 连接池内最大连接数
+      maximum-pool-size: 10
+      # 验证连接的sql语句
+      connection-test-query: SELECT 1 FROM DUAL
+      # 连接超时时间 默认30000 毫秒 如果小于250毫秒，则被重置回30秒
+      connection-timeout: 30000
+      # 验证超时时间默认5000毫秒 如果小于250毫秒，则会被重置回5秒
+      validation-timeout: 5000
+      # 设置连接在连接池中的存货时间 如果不等于0且小于30秒则会被重置回30分钟
+      max-lifetime: 1800000
+
+#日志设置
+logging:
+  level:
+    # 打印与我们程序相关的日志信息
+    com.baidu.shop: debug
+# eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+mrshop:
+  worker:
+    workerId: 1 # 项目唯一标识
+    datacenterId: 1 # 序列号 其实也是唯一标识
+  jwt:
+    pubKeyPath: G:\secret\rea.pub # 公钥地址
+    cookieName: MRSHOP_TOKEN # cookie的名称
+
+
+
+#acpsdk:
+#  ##交易请求地址
+#  frontTransUrl: https://gateway.test.95516.com/gateway/api/frontTransReq.do
+#  backTransUrl: https://gateway.test.95516.com/gateway/api/backTransReq.do
+#  singleQueryUrl: https://gateway.test.95516.com/gateway/api/queryTrans.do
+#  batchTransUrl: https://gateway.test.95516.com/gateway/api/batchTrans.do
+#  fileTransUrl: https://filedownload.test.95516.com/
+#  appTransUrl: https://gateway.test.95516.com/gateway/api/appTransReq.do
+#  cardTransUrl: https://gateway.test.95516.com/gateway/api/cardTransReq.do
+#  #以下缴费产品使用，其余产品用不到
+#  jfFrontTransUrl: https://gateway.test.95516.com/jiaofei/api/frontTransReq.do
+#  jfBackTransUrl: https://gateway.test.95516.com/jiaofei/api/backTransReq.do
+#  jfSingleQueryUrl: https://gateway.test.95516.com/jiaofei/api/queryTrans.do
+#  jfCardTransUrl: https://gateway.test.95516.com/jiaofei/api/cardTransReq.do
+#  jfAppTransUrl: https://gateway.test.95516.com/jiaofei/api/appTransReq.do
+#  # 报文版本号，固定5.1.0，请勿改动
+#  version: 5.1.0
+#  # 签名方式，证书方式固定01，请勿改动
+#  signMethod: 01
+#  # 是否验证验签证书的CN，测试环境请设置false，生产环境请设置true。非false的值默认都当true处理。
+#  ifValidateCNName: false
+#  # 是否验证https证书，测试环境请设置false，生产环境建议优先尝试true，不行再false。非true的值默认都当false处理。
+#  ifValidateRemoteCert: false
+#  #后台通知地址，填写接收银联后台通知的地址，必须外网能访问
+#  backUrl: http://222.222.222.222:8080/ACPSample_B2C/backRcvResponse
+#  #前台通知地址，填写银联前台通知的地址，必须外网能访问
+#  frontUrl: http://localhost:8080/ACPSample_B2C/frontRcvResponse
+#  #########################入网测试环境签名证书配置 ################################
+#  # 多证书的情况证书路径为代码指定，可不对此块做配置。
+#  # 签名证书路径，必须使用绝对路径，如果不想使用绝对路径，可以自行实现相对路径获取证书的方法；测试证书所有商户共用开发包中的测试签名证书，生产环境请从cfca下载得到。
+#  # windows样例：
+#  signCert:
+#    path: G:/Files/certs/acp_test_sign.pfx
+#    # linux样例（注意：在linux下读取证书需要保证证书有被应用读的权限）（后续其他路径配置也同此条说明）
+#    #acpsdk.signCert.path=/SERVICE01/usr/ac_frnas/conf/ACPtest/acp700000000000001.pfx
+#    # 签名证书密码，测试环境固定000000，生产环境请修改为从cfca下载的正式证书的密码，正式环境证书密码位数需小于等于6位，否则上传到商户服务网站会失败
+#    pwd: 000000
+#    # 签名证书类型，固定不需要修改
+#    type: PKCS12
+#  # 敏感信息加密证书路径(商户号开通了商户对敏感信息加密的权限，需要对 卡号accNo，pin和phoneNo，cvn2，expired加密（如果这些上送的话），对敏感信息加密使用)
+#  encryptCert:
+#    ##########################加密证书配置################################
+#    # 敏感信息加密证书路径(商户号开通了商户对敏感信息加密的权限，需要对 卡号accNo，pin和phoneNo，cvn2，expired加密（如果这些上送的话），对敏感信息加密使用)
+#    path: G:/Files/certs/acp_test_enc.cer
+#  ##########################验签证书配置################################
+#  # 验签中级证书路径(银联提供)
+#  middleCert:
+#    path: G:/Files/certs/acp_test_middle.cer
+#  # 验签根证书路径(银联提供)
+#  rootCert:
+#    path: G:/Files/certs/acp_test_root.cer
+
+
+
