@@ -741,14 +741,14 @@ public class BCryptUtil {
         return ret == 0;
     }
 
-/*    public static void main(String[] args) {
+    public static void main(String[] args) {
         String password = "123456";
         String mingruijiaoyu = hashpw(password, gensalt());//加密
         System.out.println(mingruijiaoyu);
 
-        String pwd = "$2a$10$nA2g16Zq1xS.CinETDlKfuxqLbZWMgIVSCGsE7G2G27PicxqoKsL.";
+        String pwd = "$2a$10$RzxPf2S1AFjLJGWjenQxWOkqT4N.YK0Y5H5OatuTpjwm6QbCBQG4e";
 
-        boolean checkpw = checkpw("1234556", pwd);//明文密码和密文密码比较
+        boolean checkpw = checkpw("123456", pwd);//明文密码和密文密码比较
         System.out.println(checkpw);
-    }*/
+    }
 }

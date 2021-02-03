@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName CarServiceImpl
@@ -58,6 +59,7 @@ public class CarServiceImpl extends BaseApiService implements CarService {
      * @param car  购物车数据
      */
     private void updateRedisByTokenAndUserCarPre(String token,String carPre,Car car){
+        List<Object> objects = Collections.synchronizedList(new ArrayList<>());
 
         //获取用户信息
         try {

@@ -65,9 +65,11 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
     private MrRabbitMQ mrRabbitMQ;
 
 
+
     @Transactional
     @Override
     public Result<Long> createOrder(OrderDTO orderDTO, String token) {
+
         //通过雪花算法生成id
         long orderId = idWorker.nextId();
         try {
@@ -150,6 +152,8 @@ public class OrderServiceImpl extends BaseApiService implements OrderService {
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            return this.setResultError("数据错误");
         }
 
         return this.setResult(HTTPStatus.OK,"支付成功",orderId + "");

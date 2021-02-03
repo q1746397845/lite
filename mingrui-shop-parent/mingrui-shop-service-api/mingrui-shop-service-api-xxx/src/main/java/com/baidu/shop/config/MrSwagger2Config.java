@@ -1,5 +1,6 @@
 package com.baidu.shop.config;
 
+import com.baidu.shop.dto.BrandDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -45,5 +46,7 @@ public class MrSwagger2Config {
                 .description("描述")
                 //创建API基本信息
                 .build();
+
     }
+
 }
