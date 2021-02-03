@@ -36,7 +36,5 @@ public class GlobalCorsConfig {
         source.registerCorsConfiguration("/**", config);
         //3.返回新的CorsFilter.
         return new CorsFilter(source);
-
-
     }
 }
